@@ -47,16 +47,16 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
     int level, type;
     struct timespec* ts_from_msg;
 
-    int found_timespec = false;
+    int found_timespec = 0;
     for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg))
     {
         if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
             ts_from_msg = (struct timespec *) CMSG_DATA(cmsg);
             // printf("TIMESTAMP %ld.%09ld\n", (long)ts_from_msg[2].tv_sec, (long)ts_from_msg[2].tv_nsec);
             //the hardware timespec is 
-            ts->tv.sec = ts_from_msg[2].tv_sec;
-            ts->tv.nsec = ts_from_msg[2].tv_nsec;
-            found_timespec = true;
+            ts->tv_sec = ts_from_msg[2].tv_sec;
+            ts->tv_nsec = ts_from_msg[2].tv_nsec;
+            found_timespec = 1;
         }
     }
 
