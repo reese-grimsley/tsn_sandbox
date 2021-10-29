@@ -34,7 +34,7 @@
 
 #include "constants.h"
 
-int setup_timestamp_on_rx_udp(int sock)
+int setup_timestamp_on_rx(int sock)
 {
     int flags;
     flags   = SOF_TIMESTAMPING_RX_SOFTWARE
