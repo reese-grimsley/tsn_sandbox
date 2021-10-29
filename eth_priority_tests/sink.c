@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 
     pthread_t recv_jammer, recv_source;
 
-    pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
+    pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_with_timestamping, NULL);
     pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
 
     pthread_join(recv_jammer, NULL);
