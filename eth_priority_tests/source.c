@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     while(1)
     {
 
-        sendto(send_sock)
+        // sendto(send_sock)
 
         wait(WAIT_DURATION);
         break;   
