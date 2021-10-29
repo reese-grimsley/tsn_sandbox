@@ -100,7 +100,7 @@ void thread_recv_jammer_with_timestamping()
 
     bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
 
-    char ctrl[CMSG_SPACE(sizeof(struct timespec))];
+    char ctrl[CMSG_SPACE(sizeof(struct timespec) * 3)];
     struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
 
     msg.msg_control = (char *) ctrl;
@@ -127,7 +127,7 @@ void thread_recv_jammer_with_timestamping()
         struct timespec *ts = NULL;
         for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg))
         {
-            if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPNS == cmsg->cmsg_type) {
+            if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
                 ts = (struct timespec *) CMSG_DATA(cmsg);
                 printf("TIMESTAMP %ld.%09ld\n", (long)ts[0].tv_sec, (long)ts[0].tv_nsec);
                 printf("TIMESTAMP %ld.%09ld\n", (long)ts[1].tv_sec, (long)ts[1].tv_nsec);
