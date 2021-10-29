@@ -115,8 +115,8 @@ int get_eth_index_num(struct ifreq* ifr)
 
     if (if_name_len < sizeof(ifr.ifr_name) ) 
     {
-        memcpy(ifr.ifr_name, if_name, if_name_len);
-        ifr.ifr_name[if_name_len] = 0;
+        memcpy(ifr->ifr_name, if_name, if_name_len);
+        ifr->ifr_name[if_name_len] = 0;
     } else 
     {
         die("interface name is too long");
@@ -127,7 +127,7 @@ int get_eth_index_num(struct ifreq* ifr)
         die("%s",strerror(errno));
     }
 
-    if (ioctl(fd,SIOCGIFINDEX,&ifr)==-1) 
+    if (ioctl(fd,SIOCGIFINDEX,ifr)==-1) 
     {
         die("%s",strerror(errno));
     }
