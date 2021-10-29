@@ -52,11 +52,11 @@ void thread_recv_jammer_with_timestamping()
         exit(errno);    
     }
 
-    if (setup_timestamp_on_rx(rcv_jam_sock) != 0)
-    {
-        printf("failed to setup timestamping on recv\n");
-        pthread_exit(NULL);
-    }
+    // if (setup_timestamp_on_rx(rcv_jam_sock) != 0)
+    // {
+    //     printf("failed to setup timestamping on recv\n");
+    //     pthread_exit(NULL);
+    // }
 
     jammer_recv_addr.sin_family = AF_INET;
     jammer_recv_addr.sin_port = SINK_PORT;
