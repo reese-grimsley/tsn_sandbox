@@ -99,7 +99,7 @@ int get_eth_index_num(struct ifreq* ifr)
 
 void print_timespec(const struct timespec ts)
 {
-    printf("T=%d.%09d", ts.tv_sec, ts.tv_nsec);
+    printf("T=%ld.%09ld", ts.tv_sec, ts.tv_nsec);
 }
 
 /**
