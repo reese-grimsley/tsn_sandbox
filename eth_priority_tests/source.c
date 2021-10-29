@@ -64,8 +64,9 @@ int main(int argc, char* argv[])
     addr.sll_pkttype = PACKET_OTHERHOST;
 
     //send packets
+    memset(&(addr.sll_addr), ETHER_ADDR_LEN, SINK_MAC_ADDR);
 
-    struct ether_tsn tsn_ethernet;
+    // struct ether_tsn tsn_ethernet;
 
     while(1)
     {
