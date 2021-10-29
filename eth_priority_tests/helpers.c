@@ -97,13 +97,13 @@ struct timespec time_diff(const struct timespec * older_time, const struct times
 
     if ((newer_time.tv_nsec - older_time.tv_nsec)<0)
     {
-            temp.tv_sec = newer_time.tv_sec-older_time.tv_sec-1;
-            temp.tv_nsec = 1000000000+newer_time.tv_nsec-older_time.tv_nsec;
+            temp.tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
+            temp.tv_nsec = 1000000000 + newer_time->tv_nsec - older_time->tv_nsec;
     }
     else 
     {
-            temp.tv_sec = newer_time.tv_sec - older_time.tv_sec;
-            temp.tv_nsec = newer_time.tv_nsec-older_time.tv_nsec;
+            temp.tv_sec = newer_time->tv_sec - older_time->tv_sec;
+            temp.tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
     }
     return temp;
 }
@@ -130,6 +130,6 @@ int wait_until(struct timespec wake_time)
 
     clock_gettime(CLOCK_REALTIME, &current_time);
 
-    sleep_duration = time_diff(current_time, wake_time);
+    sleep_duration = time_diff(&current_time, &wake_time);
     return wait(sleep_duration);
 }
