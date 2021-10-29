@@ -7,13 +7,13 @@ libs:
 
 
 jammer: libs
-	$(CC) -o jammer.out jammer.c $(CFLAGS)
+	$(CC) -o jammer.out jammer.c helpers.o $(CFLAGS)
 
 sink: libs
-	$(CC) -o sink.out sink.c $(CFLAGS)
+	$(CC) -o sink.out sink.c helpers.o $(CFLAGS)
 
 source: libs
-	$(CC) -o source.out source.c $(CFLAGS)
+	$(CC) -o source.out source.c helpers.o $(CFLAGS)
 
 
 all: jammer sink source
