@@ -120,8 +120,9 @@ int wait(struct timespec sleep_duration)
 
     int return_code = nanosleep(&sleep_duration, &remaining_time);
     if (return_code != 0) {
-        printf("Nanosleep returned non-zero [%d]; errno: ", return_code, errno);
+        printf("Nanosleep returned non-zero [%d]; errno: [%d]", return_code, errno);
     }
+    return return_code;
 }
 
 int wait_until(struct timespec wake_time)

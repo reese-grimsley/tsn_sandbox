@@ -33,12 +33,14 @@
 int main(int argc, char* argv[])
 {
 
+    //configure the socket
     int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
     }
+
 
 }
 
