@@ -32,6 +32,7 @@
 
 int main(int argc, char* argv[])
 {
+    printf("Start jammer\n");
 
     struct sockaddr_in sink_addr;
     int jammer_sock;
@@ -53,7 +54,7 @@ int main(int argc, char* argv[])
     sink_addr.sin_port = SINK_PORT;
     sink_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
 
-    printf("Send data as fast as possible");
+    printf("Send data as fast as possible\n");
 
     memset(junk_data, '^', MAX_UDP_PACKET_SIZE);
 
