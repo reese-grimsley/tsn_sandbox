@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <sys/socket.h>
+#include <errno.h>
 
 #include "constants.h"
 
@@ -24,4 +25,11 @@
 int main(int argc, char* argv[])
 {
 
+    int send_sock = socket(AF_PACKET,SOCK_RAW,IPPROTO_RAW);
+    if( send_sock == -1)
+    {
+        printf("Send socket returned err: [%d]", errno)
+    }
+
 }
+

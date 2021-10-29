@@ -13,7 +13,6 @@ source:
 	$(CC) -o source.out source.c $(CFLAGS)
 
 
-
 all: jammer sink source
 
 clean:
