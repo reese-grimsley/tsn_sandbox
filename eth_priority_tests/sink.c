@@ -38,6 +38,10 @@
 int setup_timestamp_on_rx(int sock)
 {
     int flags;
+    struct hwtstamp_config hwts_config;
+    struct ifreq ifr;
+
+
     flags   = SOF_TIMESTAMPING_RX_SOFTWARE
             | SOF_TIMESTAMPING_RX_HARDWARE 
             | SOF_TIMESTAMPING_RAW_HARDWARE;
@@ -47,9 +51,17 @@ int setup_timestamp_on_rx(int sock)
         return errno;
     }
 
-    struct ifreq ifconfig;
-    strncpy(ifconfig.ifr_name, ETH_INTERFACE_I225, sizeof(ifconfig.ifr_name));
-    ioctl(sock , SIOCSHWTSTAMP, &ifconfig);
+    /* Enable hardware timestamping on the interface */
+    memset(&hwts_config, 0, sizeof(hwts_config));
+    hwts_config.tx_type = HWTSTAMP_TX_OFF;
+    hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
+    memset(&ifr, 0, sizeof(ifr));    strncpy(ifconfig.ifr_name, ETH_INTERFACE_I225, sizeof(ifconfig.ifr_name));
+    ifr.ifr_data = (void *)&hwts_config;
+    if (ioctl(sock , SIOCSHWTSTAMP, &ifr) == -1)
+    {
+        printf("failed to set hardware timestamping");
+        return -1;
+    }
 }
 
 void thread_recv_jammer_with_timestamping()
