@@ -29,16 +29,51 @@
 
 #include "constants.h"
 
+struct timespec wait_duration = {.tv_sec = 0, .tv_nsec = 500000000};
+
 
 int main(int argc, char* argv[])
 {
 
+    //configure the socket
     int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
+    }   
+
+    struct sockaddr_ll addr;
+    struct ifreq ifr;
+
+    memset(addr, 0, sizeof(addr));
+
+    int eth_interface_index = get_eth_index_num(&ifr);
+    if (eth_interface_index < 0)
+    {
+        printf("did not find a valid ethernet interface named %s", ETH_INTERFACE_I225);
+        return eth_interface_index;
     }
+    
+
+    addr.sll_family = AF_PACKET;
+    addr.sll_procotol = htons(ETH_P_TSN);
+    addr.sll_ifindex = eth_interface_index;
+    addr.sll_halen = ETH_MAC_ADDR_LEN;
+    addr.sll_pkttype = PACKET_OTHERHOST;
+
+    //send packets
+
+    struct ether_tsn tsn_ethernet;
+
+    while(1)
+    {
+        break;   
+
+        wait(wait_duration);
+    }
+
+
 
 }
 
