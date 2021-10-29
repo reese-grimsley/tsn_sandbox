@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_801Q));
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
     eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
-    eth_frame.size = MAX_FRAME_SIZE;
+    eth_frame.data_size = MAX_FRAME_SIZE;
     memset(&eth_frame.data, 'q', MAX_FRAME_SIZE);
 
     while(1)
