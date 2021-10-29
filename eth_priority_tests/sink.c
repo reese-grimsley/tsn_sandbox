@@ -63,6 +63,11 @@ int setup_timestamp_on_rx(int sock)
         printf("failed to set hardware timestamping");
         return -1;
     }
+    if (ioctl(sock , SIOCGHWTSTAMP, &ifr) == -1)
+    {
+        printf("failed to set hardware timestamping");
+        return -1;
+    }
 
     return 0;
 }
