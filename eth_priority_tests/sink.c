@@ -80,7 +80,7 @@ void thread_recv_jammer_with_timestamping()
 
     /* Enable hardware timestamping on the interface */
     memset(&hwts_config, 0, sizeof(hwts_config));
-    hwts_config.tx_type = HWTSTAMP_TX_OFF;
+    hwts_config.tx_type = HWTSTAMP_TX_ON;
     hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
     memset(&ifr, 0, sizeof(ifr));    
     strncpy(ifr.ifr_name, ETH_INTERFACE_I225, sizeof(ifr.ifr_name));
@@ -127,7 +127,7 @@ void thread_recv_jammer_with_timestamping()
         struct timespec *ts = NULL;
         for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg))
         {
-            if (SOL_SOCKET == cmsg->cmsg_level && SCM_TIMESTAMPING == cmsg->cmsg_type) {
+            if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
                 ts = (struct timespec *) CMSG_DATA(cmsg);
                 printf("TIMESTAMP %ld.%09ld\n", (long)ts[0].tv_sec, (long)ts[0].tv_nsec);
                 printf("TIMESTAMP %ld.%09ld\n", (long)ts[1].tv_sec, (long)ts[1].tv_nsec);
