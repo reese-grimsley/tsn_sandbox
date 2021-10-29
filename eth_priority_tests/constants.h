@@ -9,6 +9,7 @@
 
 #define ETH_INTERFACE_I225 "enp87s0"
 
+#define MAX_PACKET_SIZE 1500
 
 #define JAMMER_MSG "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
 #define JAMMER_MSG_LEN  (26 * 6)

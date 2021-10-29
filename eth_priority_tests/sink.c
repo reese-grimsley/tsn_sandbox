@@ -6,7 +6,8 @@
  *     to a particular VLAN and/or priority class.
  * 
  * Assumed platform: Ubuntu 20.04 LTS, Intel Nuc (series 11), NIC i225
- * 
+ *    Must be run as SUDO!
+ *
  * Author: Reese Grimsley
  * Created: 10/29/21
  * 
@@ -33,10 +34,10 @@
 int main(int argc, char* argv[])
 {
 
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
     {
-        printf("Send socket returned err: [%d]", errno);
-    }
+        printf("Send socket returned err: [%d]\n", errno);
+        exit(errno);    }
 
 }
