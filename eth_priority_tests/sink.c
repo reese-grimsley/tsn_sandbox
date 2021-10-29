@@ -55,7 +55,7 @@ void thread_recv_jammer_data()
     while(1)
     {
         recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
-        printf("%s\n", recv_data)
+        printf("%s\n", recv_data);
     }
 
 
