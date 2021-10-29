@@ -25,6 +25,9 @@
 #include <net/if.h>
 #include <linux/if_packet.h>
 #include <sys/socket.h>
+#include <linux/sockios.h>
+#include <linux/net_tstamp.h>
+#include <netinet/in.h>
 #include <sys/time.h>
 #include <errno.h>
 #include <pthread.h>
