@@ -113,7 +113,7 @@ int get_eth_index_num(struct ifreq* ifr)
     char* if_name = ETH_INTERFACE_I225;
     size_t if_name_len = sizeof(ETH_INTERFACE_I225);
 
-    if (if_name_len < sizeof(ifr.ifr_name) ) 
+    if (if_name_len < sizeof(ifr->ifr_name) ) 
     {
         memcpy(ifr->ifr_name, if_name, if_name_len);
         ifr->ifr_name[if_name_len] = 0;
