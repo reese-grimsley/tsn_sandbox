@@ -100,7 +100,7 @@ void thread_recv_jammer_with_timestamping()
 
     bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
 
-    char ctrl[CMSG_SPACE(sizeof(struct timespec) * 3)];
+    char ctrl[4096];
     struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
 
     msg.msg_control = (char *) ctrl;
