@@ -34,7 +34,7 @@
 #include <pthread.h>
 
 #include "constants.h"
-
+#include "helpers.h"
 
 void thread_recv_jammer_with_timestamping()
 {
@@ -52,50 +52,16 @@ void thread_recv_jammer_with_timestamping()
         exit(errno);    
     }
 
-    // if (setup_timestamp_on_rx(rcv_jam_sock) != 0)
-    // {
-    //     printf("failed to setup timestamping on recv\n");
-    //     pthread_exit(NULL);
-    // }
+    if (configure_hw_timestamping(rcv_jam_sock) != 0)
+    {
+        printf("failed to setup timestamping on recv\n");
+        pthread_exit(NULL);
+    }
 
     jammer_recv_addr.sin_family = AF_INET;
     jammer_recv_addr.sin_port = SINK_PORT;
     jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
 
-    /**hw timestamp config **/
-    int flags;
-    struct hwtstamp_config hwts_config;
-    struct ifreq ifr;
-
-
-    flags   = SOF_TIMESTAMPING_RX_SOFTWARE
-            | SOF_TIMESTAMPING_RX_HARDWARE 
-            | SOF_TIMESTAMPING_RAW_HARDWARE;
-    if (setsockopt(rcv_jam_sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
-    {
-        printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
-        pthread_exit(NULL);
-    }
-
-    /* Enable hardware timestamping on the interface */
-    memset(&hwts_config, 0, sizeof(hwts_config));
-    hwts_config.tx_type = HWTSTAMP_TX_ON;
-    hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
-    memset(&ifr, 0, sizeof(ifr));    
-    strncpy(ifr.ifr_name, ETH_INTERFACE_I225, sizeof(ifr.ifr_name));
-    ifr.ifr_data = (void *)&hwts_config;
-    if (ioctl(rcv_jam_sock , SIOCSHWTSTAMP, &ifr) == -1)
-    {
-        printf("failed to set hardware timestamping");
-    pthread_exit(NULL);
-    }
-    if (ioctl(rcv_jam_sock , SIOCGHWTSTAMP, &ifr) == -1)
-    {
-        printf("failed to set hardware timestamping");
-    pthread_exit(NULL);
-    }
-
-    /*end hw config*/
 
     bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
 
@@ -123,13 +89,11 @@ void thread_recv_jammer_with_timestamping()
 
 
         int level, type;
-        struct timespec *ts = NULL;
-        for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg))
+        struct timespec ts;
+        if (get_hw_timestamp_from_msg(&msg, &ts))
         {
-            if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
-                ts = (struct timespec *) CMSG_DATA(cmsg);
-                printf("TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
-            }
+            printf("TIMESTAMP %ld.%09ld\n", (long)ts.tv_sec, (long)ts.tv_nsec);
+
         }
         count++;
     }

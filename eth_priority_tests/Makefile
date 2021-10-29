@@ -2,14 +2,17 @@
 CC = gcc
 CFLAGS = -lpthread -I . -g0
 
+libs: helpers.h
+	$(CC) -c helpers.c $(CFLAGS)
 
-jammer: 
+
+jammer: libs
 	$(CC) -o jammer.out jammer.c $(CFLAGS)
 
-sink: 
+sink: libs
 	$(CC) -o sink.out sink.c $(CFLAGS)
 
-source: 
+source: libs
 	$(CC) -o source.out source.c $(CFLAGS)
 
 
