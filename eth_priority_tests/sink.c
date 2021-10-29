@@ -112,7 +112,7 @@ void thread_recv_jammer_with_timestamping()
     iov.iov_base = recv_data;
     iov.iov_len = MAX_UDP_PACKET_SIZE;
 
-    struct timespec ts;
+    // struct timespec ts;
     int level, type, count = 0;
 
     while(count < 100)
