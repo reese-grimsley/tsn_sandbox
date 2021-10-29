@@ -154,7 +154,8 @@ int wait(struct timespec sleep_duration)
         return -1;
     }
 
-    printf("Wait for "); print_timespec(sleep_duration);
+    printf("Wait for "); print_timespec(sleep_duration); printf("\n");
+    fflush(stdout);
     int return_code = nanosleep(&sleep_duration, &remaining_time);
     if (return_code != 0) {
         printf("Nanosleep returned non-zero [%d]; errno: [%d]", return_code, errno);
