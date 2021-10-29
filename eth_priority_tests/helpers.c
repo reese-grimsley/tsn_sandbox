@@ -66,6 +66,42 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
 
 }
 
+int get_eth_index_num(struct ifreq* ifr)
+{
+    char* if_name = ETH_INTERFACE_I225;
+    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
+
+    if (if_name_len < sizeof(ifr->ifr_name) ) 
+    {
+        memcpy(ifr->ifr_name, if_name, if_name_len);
+        ifr->ifr_name[if_name_len] = 0;
+    } 
+    else 
+    {
+        printf("interface name is too long");
+        return -1;
+    }
+
+    int fd=socket(AF_UNIX,SOCK_DGRAM,0);
+    if (fd==-1) {
+        printf("%s",strerror(errno));
+        return -abs(errno);
+    }
+
+    if (ioctl(fd,SIOCGIFINDEX,ifr)==-1) 
+    {
+        printf("%s",strerror(errno));
+        return -abs(errno);
+    }
+
+    return ifr->ifr_ifindex;
+}
+
+void print_timespec(const struct timespec ts)
+{
+    printf("T=%d.%09d", ts.tv_sec, ts.tv_nsec);
+}
+
 /**
  * 
  * source: https://www.guyrutenberg.com/2007/09/22/profiling-code-using-clock_gettime/
@@ -108,37 +144,6 @@ struct timespec time_diff(const struct timespec * older_time, const struct times
     return temp;
 }
 
-int get_eth_index_num(struct ifreq* ifr)
-{
-    char* if_name = ETH_INTERFACE_I225;
-    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
-
-    if (if_name_len < sizeof(ifr->ifr_name) ) 
-    {
-        memcpy(ifr->ifr_name, if_name, if_name_len);
-        ifr->ifr_name[if_name_len] = 0;
-    } 
-    else 
-    {
-        printf("interface name is too long");
-        return -1;
-    }
-
-    int fd=socket(AF_UNIX,SOCK_DGRAM,0);
-    if (fd==-1) {
-        printf("%s",strerror(errno));
-        return -abs(errno);
-    }
-
-    if (ioctl(fd,SIOCGIFINDEX,ifr)==-1) 
-    {
-        printf("%s",strerror(errno));
-        return -abs(errno);
-    }
-
-    return ifr->ifr_ifindex;
-}
-
 
 int wait(struct timespec sleep_duration)
 {
@@ -149,6 +154,7 @@ int wait(struct timespec sleep_duration)
         return -1;
     }
 
+    printf("Wait for "); print_timespec(sleep_duration);
     int return_code = nanosleep(&sleep_duration, &remaining_time);
     if (return_code != 0) {
         printf("Nanosleep returned non-zero [%d]; errno: [%d]", return_code, errno);
