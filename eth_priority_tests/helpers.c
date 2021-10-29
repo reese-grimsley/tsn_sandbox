@@ -99,6 +99,7 @@ int get_eth_index_num(struct ifreq* ifr)
 
 int get_eth_mac_addr(struct ifreq* ifr)
 {
+    int rc;
     char* if_name = ETH_INTERFACE_I225;
     size_t if_name_len = sizeof(ETH_INTERFACE_I225);
 
@@ -117,7 +118,7 @@ int get_eth_mac_addr(struct ifreq* ifr)
 
     rc = ioctl(fd, SIOCGIFHWADDR, &if_request);
     if (rc < 0) {
-        close(fd);
+        shutdown(fd, 2);
         return -1;
     }
 }
