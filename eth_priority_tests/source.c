@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
     memset(&(addr.sll_addr), 0, sizeof(addr.sll_addr));
-    memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN;
+    memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
     // struct ether_tsn tsn_ethernet;
 
