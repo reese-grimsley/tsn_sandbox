@@ -119,17 +119,20 @@ int get_eth_index_num(struct ifreq* ifr)
         ifr->ifr_name[if_name_len] = 0;
     } else 
     {
-        die("interface name is too long");
+        printf("interface name is too long");
+        return -1;
     }
 
     int fd=socket(AF_UNIX,SOCK_DGRAM,0);
     if (fd==-1) {
-        die("%s",strerror(errno));
+        printf("%s",strerror(errno));
+        return -abs(errno)
     }
 
     if (ioctl(fd,SIOCGIFINDEX,ifr)==-1) 
     {
-        die("%s",strerror(errno));
+        printf("%s",strerror(errno));
+        return -abs(errno)
     }
 
     return ifr->ifr_ifindex;
