@@ -48,7 +48,8 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
     struct timespec* ts_from_msg;
 
     int found_timespec = 0;
-    for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg))
+    struct cmsghdr* cmsg;
+    for (cmsg = CMSG_FIRSTHDR(msg); cmsg != NULL; cmsg = CMSG_NXTHDR(msg, cmsg))
     {
         if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
             ts_from_msg = (struct timespec *) CMSG_DATA(cmsg);
