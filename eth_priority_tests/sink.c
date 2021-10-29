@@ -67,8 +67,8 @@ int main(int argc, char* argv[])
     pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
     pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
 
-    pthread_join(&recv_jammer);
-    pthread_join(&recv_source);
+    pthread_join(recv_jammer, NULL);
+    pthread_join(recv_source, NULL);
 
     printf("Exiting sink\n");
 
