@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     while(1)
     {
 
-        int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct *sockaddr) &addr, sizeof(addr));
+        int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
