@@ -100,7 +100,7 @@ void thread_recv_jammer_with_timestamping()
         for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg))
         {
             if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
-                ts = (struct timespec *) CMSG_DATA(cm);
+                ts = (struct timespec *) CMSG_DATA(cmsg);
                 printf("HW TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
             }
         }
