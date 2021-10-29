@@ -70,7 +70,8 @@ void thread_recv_jammer_with_timestamping()
 
     flags   = SOF_TIMESTAMPING_RX_SOFTWARE
             | SOF_TIMESTAMPING_RX_HARDWARE 
-            | SOF_TIMESTAMPING_RAW_HARDWARE;
+            | SOF_TIMESTAMPING_RAW_HARDWARE
+            | SOF_TIMESTAMPING_SOFTWARE;
     if (setsockopt(rcv_jam_sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
     {
         printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
@@ -136,7 +137,7 @@ void thread_recv_jammer_with_timestamping()
         count++;
     }
 
-
+    close(rcv_jam_sock);
     pthread_exit(NULL);
 }
 
