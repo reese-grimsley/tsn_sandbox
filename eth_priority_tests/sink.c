@@ -35,42 +35,6 @@
 
 #include "constants.h"
 
-int setup_timestamp_on_rx(int sock)
-{
-    int flags;
-    struct hwtstamp_config hwts_config;
-    struct ifreq ifr;
-
-
-    flags   = SOF_TIMESTAMPING_RX_SOFTWARE
-            | SOF_TIMESTAMPING_RX_HARDWARE 
-            | SOF_TIMESTAMPING_RAW_HARDWARE;
-    if (setsockopt(sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
-    {
-        printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
-        return errno;
-    }
-
-    /* Enable hardware timestamping on the interface */
-    memset(&hwts_config, 0, sizeof(hwts_config));
-    hwts_config.tx_type = HWTSTAMP_TX_OFF;
-    hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
-    memset(&ifr, 0, sizeof(ifr));    
-    strncpy(ifr.ifr_name, ETH_INTERFACE_I225, sizeof(ifr.ifr_name));
-    ifr.ifr_data = (void *)&hwts_config;
-    if (ioctl(sock , SIOCSHWTSTAMP, &ifr) == -1)
-    {
-        printf("failed to set hardware timestamping");
-        return -1;
-    }
-    if (ioctl(sock , SIOCGHWTSTAMP, &ifr) == -1)
-    {
-        printf("failed to set hardware timestamping");
-        return -1;
-    }
-
-    return 0;
-}
 
 void thread_recv_jammer_with_timestamping()
 {
@@ -97,6 +61,41 @@ void thread_recv_jammer_with_timestamping()
     jammer_recv_addr.sin_family = AF_INET;
     jammer_recv_addr.sin_port = SINK_PORT;
     jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+
+    /**hw timestamp config **/
+    int flags;
+    struct hwtstamp_config hwts_config;
+    struct ifreq ifr;
+
+
+    flags   = SOF_TIMESTAMPING_RX_SOFTWARE
+            | SOF_TIMESTAMPING_RX_HARDWARE 
+            | SOF_TIMESTAMPING_RAW_HARDWARE;
+    if (setsockopt(rcv_jam_sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
+    {
+        printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
+        return errno;
+    }
+
+    /* Enable hardware timestamping on the interface */
+    memset(&hwts_config, 0, sizeof(hwts_config));
+    hwts_config.tx_type = HWTSTAMP_TX_OFF;
+    hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
+    memset(&ifr, 0, sizeof(ifr));    
+    strncpy(ifr.ifr_name, ETH_INTERFACE_I225, sizeof(ifr.ifr_name));
+    ifr.ifr_data = (void *)&hwts_config;
+    if (ioctl(rcv_jam_sock , SIOCSHWTSTAMP, &ifr) == -1)
+    {
+        printf("failed to set hardware timestamping");
+        return -1;
+    }
+    if (ioctl(rcv_jam_sock , SIOCGHWTSTAMP, &ifr) == -1)
+    {
+        printf("failed to set hardware timestamping");
+        return -1;
+    }
+
+    /*end hw config*/
 
     bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
 
