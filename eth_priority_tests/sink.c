@@ -27,17 +27,49 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <pthread.h>
 
 #include "constants.h"
 
 
+void thread_recv_jammer_data()
+{
+    int rcv_jam_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_802_3));
+    if( rcv_jam_sock == -1)
+    {
+        printf("Recv-from-jammer socket returned err: [%d]\n", errno);
+        exit(errno);    
+    }
+
+
+    pthread_exit(NULL);
+}
+
+void thread_recv_source_data()
+{
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+    if( rcv_src_sock == -1)
+    {
+        printf("Recv-from-source socket returned err: [%d]\n", errno);
+        exit(errno);    
+    }
+
+
+    pthread_exit(NULL);
+}
+
 int main(int argc, char* argv[])
 {
 
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
-    if( send_sock == -1)
-    {
-        printf("Send socket returned err: [%d]\n", errno);
-        exit(errno);    }
+
+    pthread_t recv_jammer, recv_source;
+
+    pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
+    pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
+
+    pthread_join(&recv_jammer);
+    pthread_join(&recv_source);
+
+    printf("Exiting sink\n");
 
 }
