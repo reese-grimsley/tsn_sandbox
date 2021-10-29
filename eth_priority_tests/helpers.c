@@ -65,3 +65,71 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
 
 
 }
+
+/**
+ * 
+ * source: https://www.guyrutenberg.com/2007/09/22/profiling-code-using-clock_gettime/
+ */ 
+struct timespec time_diff(const struct timespec * older_time, const struct timespec * newer_time)
+{
+    //  struct timespec diff;
+    //  diff.tv_sec = newer_time->tv_sec - older_time->tv_sec;
+    //  diff.tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
+
+    //  if (diff.tv_nsec < 0 && diff.tv_sec == 0)
+    //  {
+    //       diff.tv_nsec = abs(diff.tv_nsec);
+    //  }
+
+    //  while (diff.tv_nsec < 0)
+    //  {
+    //       diff.tv_nsec += 1000 * 1000 * 1000;
+    //       diff.tv_sec--;
+    //  }
+    //  while (diff.tv_nsec > 1000 * 1000 * 1000)
+    //  {
+    //       diff.tv_nsec -= 1000 * 1000 * 1000;
+    //       diff.tv_sec++;
+    //  }
+
+    //  return diff;
+    timespec temp;
+
+    if ((newer_time.tv_nsec - older_time.tv_nsec)<0)
+    {
+            temp.tv_sec = newer_time.tv_sec-older_time.tv_sec-1;
+            temp.tv_nsec = 1000000000+newer_time.tv_nsec-older_time.tv_nsec;
+    }
+    else 
+    {
+            temp.tv_sec = newer_time.tv_sec - older_time.tv_sec;
+            temp.tv_nsec = newer_time.tv_nsec-older_time.tv_nsec;
+    }
+    return temp;
+}
+
+
+int wait(struct timespec sleep_duration)
+{
+    struct timespec remaining_time;
+    if (sleep_duration.tv_sec < 0)
+    {
+        printf("sleep duration is negative; return now.\n");
+        return -1;
+    }
+
+    int return_code = nanosleep(&sleep_duration, &remaining_time);
+    if (return_code != 0) {
+        printf("Nanosleep returned non-zero [%d]; errno: ", return_code, errno);
+    }
+}
+
+int wait_until(struct timespec wake_time)
+{
+    struct timespec current_time, sleep_duration;
+
+    clock_gettime(CLOCK_REALTIME, &current_time);
+
+    sleep_duration = time_diff(current_time, wake_time);
+    return wait(sleep_duration);
+}

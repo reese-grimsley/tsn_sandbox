@@ -41,8 +41,6 @@ int main(int argc, char* argv[])
 
     const size_t sockaddr_struct_len = sizeof(sink_addr);
     
-
-
     jammer_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if( jammer_sock == -1)
     {
