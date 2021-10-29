@@ -30,7 +30,7 @@
 #include "constants.h"
 #include "helpers.h"
 
-struct timespec wait_duration = {.tv_sec = 0, .tv_nsec = 500000000};
+struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 500000000};
 
 
 int main(int argc, char* argv[])
@@ -62,19 +62,21 @@ int main(int argc, char* argv[])
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;
-
-    //send packets
+    
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
     memset(&(addr.sll_addr), 0, sizeof(addr.sll_addr));
     memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
+
+    //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
+    char ethernet_buffer  = 
 
     while(1)
     {
 
-        wait(wait_duration);
+        wait(WAIT_DURATION);
         break;   
 
     }

@@ -97,6 +97,31 @@ int get_eth_index_num(struct ifreq* ifr)
     return ifr->ifr_ifindex;
 }
 
+int get_eth_mac_addr(struct ifreq* ifr)
+{
+    char* if_name = ETH_INTERFACE_I225;
+    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
+
+    if (if_name_len < sizeof(ifr->ifr_name) ) 
+    {
+        memcpy(ifr->ifr_name, if_name, if_name_len);
+        ifr->ifr_name[if_name_len] = 0;
+    } 
+    else 
+    {
+        printf("interface name is too long");
+        return -1;
+    }
+
+    int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+
+    rc = ioctl(fd, SIOCGIFHWADDR, &if_request);
+    if (rc < 0) {
+        close(fd);
+        return -1;
+    }
+}
+
 void print_timespec(const struct timespec ts)
 {
     printf("T=%ld.%09ld", ts.tv_sec, ts.tv_nsec);
@@ -155,7 +180,6 @@ int wait(struct timespec sleep_duration)
     }
 
     printf("Wait for "); print_timespec(sleep_duration); printf("\n");
-    fflush(stdout);
     int return_code = nanosleep(&sleep_duration, &remaining_time);
     if (return_code != 0) {
         printf("Nanosleep returned non-zero [%d]; errno: [%d]", return_code, errno);
