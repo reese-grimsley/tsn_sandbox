@@ -39,16 +39,75 @@ int setup_timestamp_on_rx_udp(int sock)
     int flags;
     flags   = SOF_TIMESTAMPING_TX_HARDWARE
             | SOF_TIMESTAMPING_RX_HARDWARE 
-            | SOF_TIMESTAMPING_TX_SOFTWARE
-            | SOF_TIMESTAMPING_RX_SOFTWARE 
             | SOF_TIMESTAMPING_RAW_HARDWARE;
-    if (setsockopt(sd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
+    if (setsockopt(sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
     {
         printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
         return errno;
     }
 
 
+}
+
+void thread_recv_jammer_with_timestamping()
+{
+    struct msghdr msg;
+    struct iovec iov;
+    char recv_data[MAX_UDP_PACKET_SIZE];
+    struct sockaddr_in jammer_recv_addr, jammer_send_addr;
+    socklen_t sizeof_send_addr = sizeof(jammer_send_addr);
+
+
+    int rcv_jam_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if( rcv_jam_sock == -1)
+    {
+        printf("Recv-from-jammer socket returned err: [%d]\n", errno);
+        exit(errno);    
+    }
+    setup_timestamp_on_rx_udp(rcv_jam_sock);
+
+    jammer_recv_addr.sin_family = AF_INET;
+    jammer_recv_addr.sin_port = SINK_PORT;
+    jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+
+    bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
+
+    char ctrl[CMSG_SPACE(sizeof(struct timespec))];
+    struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
+
+    msg.msg_control = (char *) ctrl;
+    msg.msg_controllen = sizeof(ctrl);
+
+    msg.msg_name = &serv_addr;
+    msg.msg_namelen = sizeof(serv_addr);
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = 1;
+    iov.iov_base = recv_data;
+    iov.iov_len = MAX_UDP_PACKET_SIZE;
+
+    struct timespec ts;
+    int level, type;
+
+    while(1)
+    {
+        // recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
+        recvmsg(rcv_jam_sock, &msg, 0);
+        printf("recv pkt\n");
+
+
+        int level, type;
+        struct timespec *ts = NULL;
+        for (cm = CMSG_FIRSTHDR(&msg); cm != NULL; cm = CMSG_NXTHDR(&msg, cm))
+        {
+            if (SOL_SOCKET == cm->cmsg_level && SO_TIMESTAMPING == cm->cmsg_type) {
+                memcpy(&ts, CMSG_DATA(cmsg), sizeof(ts));
+                printf("HW TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
+            }
+        }
+    }
+
+
+    pthread_exit(NULL);
 }
 
 void thread_recv_jammer_data()
@@ -75,18 +134,6 @@ void thread_recv_jammer_data()
     {
         recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
         printf("recv pkt\n");
-
-
-        int level, type;
-        struct cmsghdr *cm;
-        struct timespec *ts = NULL;
-        for (cm = CMSG_FIRSTHDR(&msg); cm != NULL; cm = CMSG_NXTHDR(&msg, cm))
-        {
-            if (SOL_SOCKET == cm->cmsg_level && SO_TIMESTAMPING == cm->cmsg_type) {
-                ts = (struct timespec *) CMSG_DATA(cm);
-                printf("HW TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
-            }
-        }
     }
 
 
