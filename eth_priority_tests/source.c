@@ -64,9 +64,9 @@ int main(int argc, char* argv[])
     addr.sll_pkttype = PACKET_OTHERHOST;
 
     //send packets
-    char dest_addr[ETHER_ADDR_LEN] = SINK_MAC_ADDR;
-    char src_addr[ETHER_ADDR_LEN] = SOURCE_MAC_ADDR;
-    memcpy(&(addr.sll_addr), ETHER_ADDR_LEN, &dest_addr);
+    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+    char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
+    memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN;
 
     // struct ether_tsn tsn_ethernet;
 
