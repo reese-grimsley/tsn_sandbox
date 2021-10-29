@@ -93,9 +93,9 @@ struct timespec time_diff(const struct timespec * older_time, const struct times
     //  }
 
     //  return diff;
-    timespec temp;
+    struct timespec temp;
 
-    if ((newer_time.tv_nsec - older_time.tv_nsec)<0)
+    if ((newer_time->tv_nsec - older_time->tv_nsec)<0)
     {
             temp.tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
             temp.tv_nsec = 1000000000 + newer_time->tv_nsec - older_time->tv_nsec;
