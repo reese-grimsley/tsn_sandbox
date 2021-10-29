@@ -31,6 +31,22 @@
 
 #include "constants.h"
 
+int setup_timestamp_on_rx_udp(int sock)
+{
+    int flags;
+    flags   = SOF_TIMESTAMPING_TX_HARDWARE
+            | SOF_TIMESTAMPING_RX_HARDWARE 
+            | SOF_TIMESTAMPING_TX_SOFTWARE
+            | SOF_TIMESTAMPING_RX_SOFTWARE 
+            | SOF_TIMESTAMPING_RAW_HARDWARE;
+    if (setsockopt(sd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
+    {
+        printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
+        return errno;
+    }
+
+    
+}
 
 void thread_recv_jammer_data()
 {
