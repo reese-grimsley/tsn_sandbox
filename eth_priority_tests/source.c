@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    eth_frame.transport_protocol[0] = 0x00
+    eth_frame.transport_protocol[0] = 0x00;
     eth_frame.transport_protocol[1] = 0x81; //little-endian
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
@@ -89,7 +89,11 @@ int main(int argc, char* argv[])
     while(1)
     {
 
-        // sendto(send_sock)
+        int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct *sockaddr) &addr, sizeof(addr));
+        if (rc < 0)
+        {
+            printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
+        }
 
         wait(WAIT_DURATION);
         break;   
