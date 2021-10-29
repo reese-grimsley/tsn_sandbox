@@ -36,8 +36,13 @@ int configure_hw_timestamping(int sock_fd)
     }
 }
 
-
-int get_hw_timestamp_from_msg(struct msghdr& msg, struct timespec* ts)
+/**
+ * Should have setup the socket this message came from with 'confgure_hw_timestamping(sock)'
+ * And read a message with readmsg(sock). 
+ * 
+ * The cmsg/control portion of the msg contains the timestamps, and must be allocated with enough space to hold at least 3 timespecs (index 2 is the hardware timestamp)
+ */ 
+int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
 {
     int level, type;
     struct timespec* ts_from_msg;
@@ -48,13 +53,14 @@ int get_hw_timestamp_from_msg(struct msghdr& msg, struct timespec* ts)
         if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
             ts_from_msg = (struct timespec *) CMSG_DATA(cmsg);
             // printf("TIMESTAMP %ld.%09ld\n", (long)ts_from_msg[2].tv_sec, (long)ts_from_msg[2].tv_nsec);
+            //the hardware timespec is 
             ts->tv.sec = ts_from_msg[2].tv_sec;
             ts->tv.nsec = ts_from_msg[2].tv_nsec;
             found_timespec = true;
         }
     }
 
-    return found_timespec
+    return found_timespec;
 
 
 }

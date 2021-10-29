@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <pthread.h>
 
+#include "constants.h"
 
 int configure_hw_timestamping(int sock_fd);
 int get_hw_timestamp_from_msg(struct msghdr& msg, struct timespec* ts);
