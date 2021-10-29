@@ -33,11 +33,33 @@
 int main(int argc, char* argv[])
 {
 
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_802_3));
-    if( send_sock == -1)
+    struct sockaddr_in sink_addr;
+    int jammer_sock;
+    char junk_data[MAX_UDP_PACKET_SIZE];
+
+
+    const size_t sockaddr_struct_len = sizeof(sink_addr);
+    
+
+
+    jammer_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if( jammer_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
+    }
+
+    sink_addr.sin_family = AF_INET;
+    sink_addr.sin_port = SINK_PORT;
+    sink_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+
+    printf("Send data as fast as possible");
+
+    memset(junk_data, 0xc7, MAX_UDP_PACKET_SIZE);
+
+    while(1)
+    {
+        sendto(jammer_sock, junk_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &sink_addr, sockaddr_struct_len);
     }
 
 }

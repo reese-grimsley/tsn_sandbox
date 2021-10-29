@@ -34,11 +34,27 @@
 
 void thread_recv_jammer_data()
 {
-    int rcv_jam_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_802_3));
+    char recv_data[MAX_UDP_PACKET_SIZE];
+    struct sockaddr_in jammer_recv_addr, jammer_send_addr;
+    socklen_t sizeof_send_addr = sizeof(jammer_send_addr);
+
+
+    int rcv_jam_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if( rcv_jam_sock == -1)
     {
         printf("Recv-from-jammer socket returned err: [%d]\n", errno);
         exit(errno);    
+    }
+
+    jammer_recv_addr.sin_family = AF_INET;
+    jammer_recv_addr.sin_port = SINK_PORT;
+    jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+
+    bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
+
+    while(1)
+    {
+        recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
     }
 
 
