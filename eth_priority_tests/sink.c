@@ -63,6 +63,8 @@ int setup_timestamp_on_rx(int sock)
         printf("failed to set hardware timestamping");
         return -1;
     }
+
+    return 0;
 }
 
 void thread_recv_jammer_with_timestamping()
@@ -80,7 +82,11 @@ void thread_recv_jammer_with_timestamping()
         printf("Recv-from-jammer socket returned err: [%d]\n", errno);
         exit(errno);    
     }
-    setup_timestamp_on_rx(rcv_jam_sock);
+    if (setup_timestamp_on_rx(rcv_jam_sock) != 0)
+    {
+        printf("failed to setup timestamping on recv\n");
+        pthread_exit(NULL);
+    }
 
     jammer_recv_addr.sin_family = AF_INET;
     jammer_recv_addr.sin_port = SINK_PORT;
