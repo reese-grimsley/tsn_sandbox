@@ -29,6 +29,8 @@
 
 #include "constants.h"
 #include "helpers.h"
+#include "types.h"
+
 
 struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 500000000};
 
@@ -37,7 +39,7 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
@@ -58,7 +60,7 @@ int main(int argc, char* argv[])
     
 
     addr.sll_family = AF_PACKET;
-    addr.sll_protocol = htons(ETH_P_TSN);
+    addr.sll_protocol = htons(ETH_P_VLAN);
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;
@@ -71,10 +73,29 @@ int main(int argc, char* argv[])
 
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
-    char ethernet_buffer  = 
+    struct ethernet_frame_8021Q eth_frame;
+
+    //recall communications typically use little-endian
+    memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
+    memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
+    eth_frame.transport_protocol[0] = 0x00;
+    eth_frame.transport_protocol[1] = 0x81; //little-endian
+    eth_frame.TCI.priority = 0;
+    eth_frame.TCI.drop_indicator = 0; 
+    eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    eth_frame.data_size = MAX_FRAME_DATA_LEN;
+    memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     while(1)
     {
+
+        int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
+        if (rc < 0)
+        {
+            printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
+            char s[128];
+            perror("socket fail");
+        }
 
         wait(WAIT_DURATION);
         break;   

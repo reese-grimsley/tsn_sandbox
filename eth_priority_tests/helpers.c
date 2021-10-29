@@ -116,7 +116,7 @@ int get_eth_mac_addr(struct ifreq* ifr)
 
     int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
 
-    rc = ioctl(fd, SIOCGIFHWADDR, &if_request);
+    rc = ioctl(fd, SIOCGIFHWADDR, ifr);
     if (rc < 0) {
         shutdown(fd, 2);
         return -1;
