@@ -108,6 +108,33 @@ struct timespec time_diff(const struct timespec * older_time, const struct times
     return temp;
 }
 
+int get_eth_index_num(struct ifreq* ifr)
+{
+    char* if_name = ETH_INTERFACE_I225;
+    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
+
+    if (if_name_len < sizeof(ifr.ifr_name) ) 
+    {
+        memcpy(ifr.ifr_name, if_name, if_name_len);
+        ifr.ifr_name[if_name_len] = 0;
+    } else 
+    {
+        die("interface name is too long");
+    }
+
+    int fd=socket(AF_UNIX,SOCK_DGRAM,0);
+    if (fd==-1) {
+        die("%s",strerror(errno));
+    }
+
+    if (ioctl(fd,SIOCGIFINDEX,&ifr)==-1) 
+    {
+        die("%s",strerror(errno));
+    }
+
+    return ifr->ifr_ifindex;
+}
+
 
 int wait(struct timespec sleep_duration)
 {

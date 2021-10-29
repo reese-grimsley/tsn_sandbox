@@ -26,6 +26,7 @@
 
 int configure_hw_timestamping(int sock_fd);
 int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts);
+int get_eth_index_num(struct ifreq* ifr);
 
 struct timespec time_diff(const struct timespec * last_time, const struct timespec * current_time);
 int wait_until(struct timespec ts);
