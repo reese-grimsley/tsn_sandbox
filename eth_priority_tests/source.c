@@ -83,8 +83,8 @@ int main(int argc, char* argv[])
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
     eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
-    eth_frame.data_size = 1480;
-    memset(&eth_frame.data, 'q', 1480);
+    eth_frame.data_size = 1496;
+    memset(&eth_frame.data, 'q', 1496);
 
     while(1)
     {
