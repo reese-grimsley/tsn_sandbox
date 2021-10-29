@@ -37,7 +37,7 @@
 int setup_timestamp_on_rx_udp(int sock)
 {
     int flags;
-    flags   = SOF_TIMESTAMPING_TX_HARDWARE
+    flags   = SOF_TIMESTAMPING_RX_SOFTWARE
             | SOF_TIMESTAMPING_RX_HARDWARE 
             | SOF_TIMESTAMPING_RAW_HARDWARE;
     if (setsockopt(sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
