@@ -78,8 +78,8 @@ void thread_recv_jammer_with_timestamping()
     msg.msg_control = (char *) ctrl;
     msg.msg_controllen = sizeof(ctrl);
 
-    msg.msg_name = &serv_addr;
-    msg.msg_namelen = sizeof(serv_addr);
+    msg.msg_name = &jammer_recv_addr;
+    msg.msg_namelen = sizeof(jammer_recv_addr);
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     iov.iov_base = recv_data;
