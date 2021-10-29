@@ -31,8 +31,9 @@ int get_eth_index_num(struct ifreq* ifr);
 
 void print_timespec(const struct timespec ts);
 struct timespec time_diff(const struct timespec * last_time, const struct timespec * current_time);
-int wait_until(struct timespec ts);
-int wait(struct timespec sleep_duration);
+int wait_until(struct timespec ts, int no_print);
+int wait(struct timespec sleep_duration, int no_print);
 
+void print_hex(const char* msg, int len);
 
 #endif

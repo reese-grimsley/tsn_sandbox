@@ -32,10 +32,15 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <pthread.h>
+#include <math.h>
+#include <time.h>
 
 #include "constants.h"
 #include "helpers.h"
 #include "types.h"
+
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+
 
 void thread_recv_jammer_with_timestamping()
 {
@@ -135,14 +140,70 @@ void thread_recv_jammer_data()
 
 void thread_recv_source_data()
 {
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+
+    struct ifreq ifr;
+    int rc;
+    char ctrl[4096], data[4096];
+    struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
+    struct sockaddr_ll rcv_src_addr;
+    struct timespec ts;
+    struct msghdr msg;
+    struct iovec iov;
+
+    iov.iov_base = data;
+    iov.iov_len = 1500;
+
+    msg.msg_control = (char *) ctrl;
+    msg.msg_controllen = sizeof(ctrl);
+
+    msg.msg_name = &rcv_src_addr;
+    msg.msg_namelen = sizeof(rcv_src_addr);
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = iov.iov_len;
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
         exit(errno);    
     }
 
+    rc = get_eth_index_num(&ifr);
+    if (rc == -1)
+    {
+        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+    }
 
+    rc = configure_hw_timestamping(rcv_src_sock);
+    if (rc == -1)
+    {
+        printf("Failed to setup; shutdown. errno [%d]", errno);
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+
+    }
+
+    rcv_src_addr.sll_family = AF_PACKET;
+    rcv_src_addr.sll_protocol = htons(ETH_P_8021Q);
+    rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
+    rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
+    rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
+
+    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+    memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
+    memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
+
+    struct ethernet_frame_8021Q frame;
+
+    while(1)
+    {
+        recvmsg(rcv_src_sock, &msg, 0);
+
+        int header_len = sizeof(frame) - sizeof(frame.data);
+        int print_size = min(header_len, msg.msg_iov->iov_len);
+        print_hex(msg.msg_iov->iov_base, print_size);
+    }
 
 
     pthread_exit(NULL);
@@ -150,14 +211,24 @@ void thread_recv_source_data()
 
 int main(int argc, char* argv[])
 {
-
+    int use_jammer = 0;
+    if (argc >=2 && strcmp(argv[1], "jam") == 0 )
+    {
+        use_jammer = 1;
+    }
 
     pthread_t recv_jammer, recv_source;
 
-    pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_with_timestamping, NULL);
+    if (use_jammer)
+    {
+        pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_with_timestamping, NULL);
+    }
     pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
 
-    pthread_join(recv_jammer, NULL);
+    if (use_jammer)
+    {
+        pthread_join(recv_jammer, NULL);
+    }
     pthread_join(recv_source, NULL);
 
     printf("Exiting sink\n");
