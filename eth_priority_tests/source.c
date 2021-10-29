@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_801Q));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
@@ -73,10 +73,22 @@ int main(int argc, char* argv[])
 
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
-    char ethernet_buffer  = 
+    struct ethernet_frame_8021Q eth_frame;
+
+    //recall communications typically use little-endian
+    memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
+    memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
+    eth_frame.transport_protocol = {0x00, 0x81}; //little-endian
+    eth_frame.TCI.priority = 0;
+    eth_frame.TCI.drop_indicator = 0; 
+    eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    eth_frame.size = MAX_FRAME_SIZE;
+    memset(&eth_frame.data, 'q', MAX_FRAME_SIZE);
 
     while(1)
     {
+
+        sendto(send_sock)
 
         wait(WAIT_DURATION);
         break;   
