@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
     printf("Send data as fast as possible");
 
-    memset(junk_data, 0xc7, MAX_UDP_PACKET_SIZE);
+    memset(junk_data, '^', MAX_UDP_PACKET_SIZE);
 
     while(1)
     {
