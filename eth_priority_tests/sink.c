@@ -55,7 +55,8 @@ int setup_timestamp_on_rx(int sock)
     memset(&hwts_config, 0, sizeof(hwts_config));
     hwts_config.tx_type = HWTSTAMP_TX_OFF;
     hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
-    memset(&ifr, 0, sizeof(ifr));    strncpy(ifconfig.ifr_name, ETH_INTERFACE_I225, sizeof(ifconfig.ifr_name));
+    memset(&ifr, 0, sizeof(ifr));    
+    strncpy(ifr.ifr_name, ETH_INTERFACE_I225, sizeof(ifr.ifr_name));
     ifr.ifr_data = (void *)&hwts_config;
     if (ioctl(sock , SIOCSHWTSTAMP, &ifr) == -1)
     {
