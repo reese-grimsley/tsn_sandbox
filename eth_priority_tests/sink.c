@@ -24,11 +24,12 @@
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <linux/if_packet.h>
-#include <sys/socket.h>
 #include <linux/sockios.h>
 #include <linux/net_tstamp.h>
 #include <netinet/in.h>
 #include <sys/time.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <errno.h>
 #include <pthread.h>
 
