@@ -79,7 +79,7 @@ void thread_recv_jammer_data()
         struct timespec *ts = NULL;
         for (cm = CMSG_FIRSTHDR(&msg); cm != NULL; cm = CMSG_NXTHDR(&msg, cm))
         {
-            if (SOL_SOCKET == level && SO_TIMESTAMPING == type) {
+            if (SOL_SOCKET == cm->cmsg_level && SO_TIMESTAMPING == cm->cmsg_type) {
                 ts = (struct timespec *) CMSG_DATA(cm);
                 printf("HW TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
             }
