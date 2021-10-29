@@ -74,7 +74,7 @@ void thread_recv_jammer_with_timestamping()
     if (setsockopt(rcv_jam_sock, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
     {
         printf("ERROR: setsockopt SO_TIMESTAMPING: [%d]\n", errno);
-        return errno;
+        pthread_exit(NULL);
     }
 
     /* Enable hardware timestamping on the interface */
@@ -87,12 +87,12 @@ void thread_recv_jammer_with_timestamping()
     if (ioctl(rcv_jam_sock , SIOCSHWTSTAMP, &ifr) == -1)
     {
         printf("failed to set hardware timestamping");
-        return -1;
+    pthread_exit(NULL);
     }
     if (ioctl(rcv_jam_sock , SIOCGHWTSTAMP, &ifr) == -1)
     {
         printf("failed to set hardware timestamping");
-        return -1;
+    pthread_exit(NULL);
     }
 
     /*end hw config*/
