@@ -45,7 +45,7 @@ int setup_timestamp_on_rx_udp(int sock)
         return errno;
     }
 
-    
+
 }
 
 void thread_recv_jammer_data()
@@ -72,6 +72,18 @@ void thread_recv_jammer_data()
     {
         recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
         printf("recv pkt\n");
+
+
+        int level, type;
+        struct cmsghdr *cm;
+        struct timespec *ts = NULL;
+        for (cm = CMSG_FIRSTHDR(&msg); cm != NULL; cm = CMSG_NXTHDR(&msg, cm))
+        {
+            if (SOL_SOCKET == level && SO_TIMESTAMPING == type) {
+                ts = (struct timespec *) CMSG_DATA(cm);
+                printf("HW TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
+            }
+        }
     }
 
 
