@@ -29,6 +29,8 @@
 
 #include "constants.h"
 #include "helpers.h"
+#include "types.h"
+
 
 struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 500000000};
 
@@ -58,7 +60,7 @@ int main(int argc, char* argv[])
     
 
     addr.sll_family = AF_PACKET;
-    addr.sll_protocol = htons(ETH_P_TSN);
+    addr.sll_protocol = htons(ETH_P_VLAN);
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;

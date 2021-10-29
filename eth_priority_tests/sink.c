@@ -35,6 +35,7 @@
 
 #include "constants.h"
 #include "helpers.h"
+#include "types.h"
 
 void thread_recv_jammer_with_timestamping()
 {
@@ -141,7 +142,7 @@ void thread_recv_source_data()
         exit(errno);    
     }
 
-    
+
 
 
     pthread_exit(NULL);
