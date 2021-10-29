@@ -113,13 +113,13 @@ void thread_recv_jammer_with_timestamping()
     iov.iov_len = MAX_UDP_PACKET_SIZE;
 
     // struct timespec ts;
-    int level, type, count = 0;
+    int level, type, count = 1;
 
-    while(count < 100)
+    while(1)
     {
         // recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
         recvmsg(rcv_jam_sock, &msg, 0);
-        printf("recv pkt\n");
+        printf("recv pkt [%d]\n", count);
 
 
         int level, type;
@@ -128,8 +128,6 @@ void thread_recv_jammer_with_timestamping()
         {
             if (SOL_SOCKET == cmsg->cmsg_level && SO_TIMESTAMPING == cmsg->cmsg_type) {
                 ts = (struct timespec *) CMSG_DATA(cmsg);
-                printf("TIMESTAMP %ld.%09ld\n", (long)ts[0].tv_sec, (long)ts[0].tv_nsec);
-                printf("TIMESTAMP %ld.%09ld\n", (long)ts[1].tv_sec, (long)ts[1].tv_nsec);
                 printf("TIMESTAMP %ld.%09ld\n", (long)ts[2].tv_sec, (long)ts[2].tv_nsec);
             }
         }
