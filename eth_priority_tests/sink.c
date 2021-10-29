@@ -134,7 +134,7 @@ void thread_recv_jammer_with_timestamping()
         count++;
     }
 
-    close(rcv_jam_sock);
+    shutdown(rcv_jam_sock, 2);
     pthread_exit(NULL);
 }
 
