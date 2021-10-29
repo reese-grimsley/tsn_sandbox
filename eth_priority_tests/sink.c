@@ -46,7 +46,9 @@ int setup_timestamp_on_rx_udp(int sock)
         return errno;
     }
 
-
+    struct ifreq ifconfig;
+    strncpy(ifconfig.ifr_name, ETH_INTERFACE_I225, sizeof(ifconfig.ifr_name));
+    ioctl(sock , SIOCSHWTSTAMP, &ifconfig);
 }
 
 void thread_recv_jammer_with_timestamping()
@@ -64,7 +66,7 @@ void thread_recv_jammer_with_timestamping()
         printf("Recv-from-jammer socket returned err: [%d]\n", errno);
         exit(errno);    
     }
-    setup_timestamp_on_rx_udp(rcv_jam_sock);
+    setup_timestamp_on_rx(rcv_jam_sock);
 
     jammer_recv_addr.sin_family = AF_INET;
     jammer_recv_addr.sin_port = SINK_PORT;
