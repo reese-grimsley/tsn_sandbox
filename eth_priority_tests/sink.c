@@ -195,8 +195,9 @@ void thread_recv_source_data()
     {
         recvmsg(rcv_src_sock, &msg, 0);
 
-        header_len = sizeof(frame) - sizeof(frame.data);
-        print_hex(msg.msg_iov->iov_base, msg.msg_iov->iov_len);
+        int header_len = sizeof(frame) - sizeof(frame.data);
+        int print_size = min(header_len, msg.msg_iov->iov_len);
+        print_hex(msg.msg_iov->iov_base, print_size);
     }
 
 
