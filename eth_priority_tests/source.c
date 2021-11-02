@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     eth_frame.transport_protocol[0] = 0x81; //little-endian
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
-    eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    eth_frame.TCI.vlan_id = 2; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
     eth_frame.data_size = MAX_FRAME_DATA_LEN;
     // memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 

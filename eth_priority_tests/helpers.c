@@ -211,7 +211,7 @@ void print_hex(const char* str, int len)
     while (bytes_left-- > 0)
     {
         printf("%02x  ", (uint8_t) str[len-bytes_left]);
-        if (bytes_left % 20 == 0)
+        if ((len-bytes_left) % 20 == 0)
         {
             printf("\n\t0x ");
         }
