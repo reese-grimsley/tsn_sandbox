@@ -151,7 +151,7 @@ void thread_recv_source_data()
     struct iovec iov;
 
     iov.iov_base = data;
-    iov.iov_len = 1500;
+    iov.iov_len = 4096;
 
     msg.msg_control = (char *) ctrl;
     msg.msg_controllen = sizeof(ctrl);
@@ -159,7 +159,7 @@ void thread_recv_source_data()
     msg.msg_name = &rcv_src_addr;
     msg.msg_namelen = sizeof(rcv_src_addr);
     msg.msg_iov = &iov;
-    msg.msg_iovlen = iov.iov_len;
+    msg.msg_iovlen = 1;
     int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
     if( rcv_src_sock == -1)
     {
@@ -200,7 +200,13 @@ void thread_recv_source_data()
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
+        if (msg_size == -1)
+        {
+            printf("recvmsg signalled error: [%d]", errno);
+            continue;
+        }
         printf("Received message of length [%d]", msg_size);
+        
 
         int header_len = sizeof(frame) - sizeof(frame.data);
         int print_size = min(header_len, msg.msg_iov->iov_len);
