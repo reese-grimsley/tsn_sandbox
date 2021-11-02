@@ -4,7 +4,7 @@
 
 typedef struct tag_control
 {
-    unsigned int TPID : 16
+    unsigned int TPID : 16;
     unsigned int priority : 3;
     unsigned int drop_indicator : 1;
     unsigned int vlan_id : 12;
