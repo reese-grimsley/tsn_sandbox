@@ -160,7 +160,7 @@ void thread_recv_source_data()
     msg.msg_namelen = sizeof(rcv_src_addr);
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if( rcv_src_sock == -1)
     {
@@ -186,7 +186,8 @@ void thread_recv_source_data()
     }
 
     rcv_src_addr.sll_family = AF_PACKET;
-    rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
+    // rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
+    rcv_src_addr.sll_protocol = htons(ETH_P_TSN);
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
@@ -198,13 +199,11 @@ void thread_recv_source_data()
     struct ethernet_frame_8021Q frame;
 
     printf("Start steady state in sink of source-sink connection\n");
-    int raw_sock_tsn = socket(AF_PACKET, SOCK_RAW, htons(0x22f0));
 
     while(1)
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
-        msg_size = recvfrom(raw_sock_tsn, buf, sizeof(buf), 0, NULL, 0);
         if (msg_size == -1)
         {
             printf("recvmsg signalled error: [%d]\n", errno);
