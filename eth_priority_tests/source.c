@@ -90,10 +90,20 @@ int main(int argc, char* argv[])
 
     printf("Start source side of source-sink connection\n");
     int counter = 1;
+    int raw_sock_tsn = socket(AF_PACKET, SOCK_RAW, htons(0x22f0));
+
     while(1)
     {
         // int rc = 0;
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
+        if (rc < 0)
+        {
+            printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
+            // perror("socket fail");
+            continue;
+        }
+
+        int rc = sendto(raw_sock_tsn, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);

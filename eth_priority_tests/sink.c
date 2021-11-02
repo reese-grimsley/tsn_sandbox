@@ -143,7 +143,7 @@ void thread_recv_source_data()
 
     struct ifreq ifr;
     int rc;
-    char ctrl[4096], data[4096];
+    char ctrl[4096], data[4096], buf[4096];
     struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
     struct sockaddr_ll rcv_src_addr;
     struct timespec ts;
@@ -198,6 +198,8 @@ void thread_recv_source_data()
     struct ethernet_frame_8021Q frame;
 
     printf("Start steady state in sink of source-sink connection\n");
+    int raw_sock_tsn = socket(AF_PACKET, SOCK_RAW, htons(0x22f0));
+
     while(1)
     {
         int msg_size;
