@@ -32,6 +32,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <pthread.h>
+#include <math.h>
 
 #include "constants.h"
 #include "helpers.h"
