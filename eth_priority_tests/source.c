@@ -83,13 +83,12 @@ int main(int argc, char* argv[])
     eth_frame.transport_protocol = htons(ETH_P_VLAN);
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
-    eth_frame.TCI.vlan_id = 2; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    eth_frame.TCI.vlan_id = 3; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
     eth_frame.data_size = MAX_FRAME_DATA_LEN;
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
     int counter = 1;
-    int raw_sock_tsn = socket(AF_PACKET, SOCK_RAW, htons(0x22f0));
 
     while(1)
     {
@@ -102,13 +101,6 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        rc = sendto(raw_sock_tsn, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
-        if (rc < 0)
-        {
-            printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
-            // perror("socket fail");
-            continue;
-        }
         printf("send msg %d of  %d bytes\t", counter, rc);
 
         int no_print = 0;
