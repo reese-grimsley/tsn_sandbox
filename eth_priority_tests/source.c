@@ -74,6 +74,8 @@ int main(int argc, char* argv[])
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
     struct ethernet_frame_8021Q eth_frame;
+    memset(&frame, 0, sizeof(frame));
+
 
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
