@@ -91,6 +91,7 @@ int main(int argc, char* argv[])
     {
         printf("...");
         printf(",");
+        int rc = 0;
         // int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
