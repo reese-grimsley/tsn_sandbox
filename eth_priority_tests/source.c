@@ -80,8 +80,8 @@ int main(int argc, char* argv[])
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    eth_frame.transport_protocol[0] = 0x00;
-    eth_frame.transport_protocol[1] = 0x81; //little-endian?
+    eth_frame.transport_protocol[0] = 0x81; //little-endian?
+    eth_frame.transport_protocol[1] = 0x00;
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
     eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
