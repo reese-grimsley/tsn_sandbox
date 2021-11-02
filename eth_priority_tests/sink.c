@@ -160,7 +160,7 @@ void thread_recv_source_data()
     msg.msg_namelen = sizeof(rcv_src_addr);
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
@@ -185,7 +185,7 @@ void thread_recv_source_data()
     }
 
     rcv_src_addr.sll_family = AF_PACKET;
-    rcv_src_addr.sll_protocol = htons(ETH_P_8021Q);
+    rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;

@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     
 
     addr.sll_family = AF_PACKET;
-    addr.sll_protocol = htons(ETH_P_8021Q);
+    addr.sll_protocol = htons(ETH_P_VLAN);
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;
@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    eth_frame.transport_protocol[0] = 0x00;
-    eth_frame.transport_protocol[1] = 0x81; //little-endian
+    eth_frame.transport_protocol[1] = 0x00;
+    eth_frame.transport_protocol[0] = 0x81; //little-endian
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
     eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
