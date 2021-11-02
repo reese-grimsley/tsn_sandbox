@@ -199,11 +199,14 @@ void thread_recv_source_data()
     struct ethernet_frame_8021Q frame;
 
     printf("Start steady state in sink of source-sink connection\n");
+    struct timespec now, start, diff;
 
+    clock_gettime(CLOCK_REALTIME, &start);
     while(1)
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
+        clock_gettime(CLOCK_REALTIME, &now);
         if (msg_size == -1)
         {
             printf("recvmsg signalled error: [%d]\n", errno);
@@ -218,7 +221,11 @@ void thread_recv_source_data()
             print_hex(msg.msg_iov->iov_base, print_size);
             printf("\n");
             // print_hex(buf, msg_size);
-            printf("\n\n");
+            printf("\n");
+            printf("time since start: ");
+            diff = time_diff(&start, &now);
+            print_timespec(diff);
+            printf("\n\n")
         }
 
     }
