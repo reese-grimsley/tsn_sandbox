@@ -97,7 +97,6 @@ int main(int argc, char* argv[])
         }
 
         wait(WAIT_DURATION);
-        break;   
 
     }
 
