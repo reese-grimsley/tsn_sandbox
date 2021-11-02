@@ -225,7 +225,7 @@ void thread_recv_source_data()
             printf("time since start: ");
             diff = time_diff(&start, &now);
             print_timespec(diff);
-            printf("\n\n")
+            printf("\n\n");
         }
 
     }
