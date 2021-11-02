@@ -138,7 +138,7 @@ void thread_recv_source_data()
 
     struct ifreq ifr;
     int rc;
-    char ctrl[4096] data[4096];
+    char ctrl[4096], data[4096];
     struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
     struct sockaddr_ll rcv_src_addr;
     struct timespec ts;
@@ -165,7 +165,7 @@ void thread_recv_source_data()
     rc = get_eth_index_num(&ifr);
     if (rc == -1)
     {
-        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno)
+        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
         shutdown(rcv_src_sock, 2);
         exit(errno);
     }
@@ -180,14 +180,14 @@ void thread_recv_source_data()
     }
 
     rcv_src_addr.sll_family = AF_PACKET;
-    rcv_src_addr.ssl_protocol = htons(ETH_P_8021Q);
+    rcv_src_addr.sll_protocol = htons(ETH_P_8021Q);
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
 
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
-    memset(&(addr.sll_addr), 0, sizeof(addr.sll_addr));
-    memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
+    memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
+    memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
 
     while(1)
