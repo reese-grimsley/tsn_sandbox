@@ -213,11 +213,12 @@ void thread_recv_source_data()
             printf("Received message of length [%d]\n", msg_size);
             
 
-            // int header_len = sizeof(frame) - sizeof(frame.data);
-            // int print_size = min(header_len, msg.msg_iov->iov_len);
-            // print_hex(msg.msg_iov->iov_base, print_size);
-            // printf("\n");
-            print_hex(buf, msg_size);
+            int header_len = sizeof(frame) - sizeof(frame.data);
+            int print_size = min(header_len, msg.msg_iov->iov_len);
+            print_hex(msg.msg_iov->iov_base, print_size);
+            printf("\n");
+            // print_hex(buf, msg_size);
+            printf("\n\n");
         }
 
     }
