@@ -226,6 +226,7 @@ void thread_recv_source_data()
             diff = time_diff(&start, &now);
             print_timespec(diff);
             printf("\n\n");
+            fflush(stdout);
         }
 
     }
