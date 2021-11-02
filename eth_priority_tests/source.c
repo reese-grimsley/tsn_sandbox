@@ -86,9 +86,10 @@ int main(int argc, char* argv[])
     eth_frame.data_size = MAX_FRAME_DATA_LEN;
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
+    printf("Start source side of source-sink connection\n");
     while(1)
     {
-
+        printf(".");
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
