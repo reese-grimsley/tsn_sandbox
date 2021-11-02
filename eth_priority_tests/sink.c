@@ -173,7 +173,7 @@ void thread_recv_source_data()
     rc = configure_hw_timestamping(rcv_src_sock);
     if (rc == -1)
     {
-        printf("Failed to setup; shutdown. errno [%d]", errno)
+        printf("Failed to setup; shutdown. errno [%d]", errno);
         shutdown(rcv_src_sock, 2);
         exit(errno);
 
