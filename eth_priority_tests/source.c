@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        int rc = sendto(raw_sock_tsn, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
+        rc = sendto(raw_sock_tsn, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
