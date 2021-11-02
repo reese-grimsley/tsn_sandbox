@@ -87,10 +87,10 @@ int main(int argc, char* argv[])
     // memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
+    int counter = 1;
     while(1)
     {
-        printf("...");
-        printf(",");
+        printf("send msg %d\t", counter);
         int rc = 0;
         // int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
         }
         int no_print = 0;
         wait(WAIT_DURATION, no_print);
-
+        counter++;
     }
 
 
