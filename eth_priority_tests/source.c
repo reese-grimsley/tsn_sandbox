@@ -81,9 +81,9 @@ int main(int argc, char* argv[])
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
     eth_frame.transport_protocol = htons(ETH_P_VLAN);
-    eth_frame.TCI.priority = 0;
+    eth_frame.TCI.priority = 7;
     eth_frame.TCI.drop_indicator = 0; 
-    eth_frame.TCI.vlan_id = 0; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    eth_frame.TCI.vlan_id = 2; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
     eth_frame.data_size = MAX_FRAME_DATA_LEN;
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
