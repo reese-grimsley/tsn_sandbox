@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
     printf("Start source side of source-sink connection\n");
     while(1)
     {
-        printf(".");
-        
+        printf("...");
+        printf(",");
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
