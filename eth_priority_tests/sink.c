@@ -204,6 +204,7 @@ void thread_recv_source_data()
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
+        msg_size = recvfrom(raw_sock_tsn, buf, sizeof(buf), 0, NULL, 0);
         if (msg_size == -1)
         {
             printf("recvmsg signalled error: [%d]\n", errno);
@@ -213,10 +214,11 @@ void thread_recv_source_data()
             printf("Received message of length [%d]\n", msg_size);
             
 
-            int header_len = sizeof(frame) - sizeof(frame.data);
-            int print_size = min(header_len, msg.msg_iov->iov_len);
-            print_hex(msg.msg_iov->iov_base, print_size);
-            printf("\n");
+            // int header_len = sizeof(frame) - sizeof(frame.data);
+            // int print_size = min(header_len, msg.msg_iov->iov_len);
+            // print_hex(msg.msg_iov->iov_base, print_size);
+            // printf("\n");
+            print_hex(buf, msg_size);
         }
 
     }
