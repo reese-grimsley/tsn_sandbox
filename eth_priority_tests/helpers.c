@@ -183,7 +183,9 @@ int wait(struct timespec sleep_duration, int no_print)
     }
 
     if (!no_print) 
-    { printf("Wait for "); print_timespec(sleep_duration); printf("\n"); }
+    { 
+        printf("Wait for "); print_timespec(sleep_duration); printf("\n"); 
+    }
     int return_code = nanosleep(&sleep_duration, &remaining_time);
     if (return_code != 0) {
         printf("Nanosleep returned non-zero [%d]; errno: [%d]", return_code, errno);
@@ -208,8 +210,8 @@ void print_hex(const char* str, int len)
     printf("\t0x");
     while (bytes_left-- > 0)
     {
-        printf("%02x  ", (int8_t) str[len-bytes_left]);
-        if (bytes_left % 20 == 0)
+        printf("%02x  ", (uint8_t) str[len-bytes_left]);
+        if ((len-bytes_left) % 20 == 0)
         {
             printf("\n\t0x ");
         }
