@@ -34,5 +34,6 @@ struct timespec time_diff(const struct timespec * last_time, const struct timesp
 int wait_until(struct timespec ts);
 int wait(struct timespec sleep_duration);
 
+void print_hex(const char* msg, int len);
 
 #endif

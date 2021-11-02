@@ -197,3 +197,19 @@ int wait_until(struct timespec wake_time)
     sleep_duration = time_diff(&current_time, &wake_time);
     return wait(sleep_duration);
 }
+
+
+void print_hex(const char* str, int len)
+{
+    int bytes_left = len;
+    printf("\t");
+    while (bytes_left-- > 0)
+    {
+        printf("0x%x", (int8_t) str[len-bytes_left]);
+        if (bytes_left % 20 == 0)
+        {
+            printf("\n\t");
+        }
+    }
+    
+}

@@ -93,7 +93,6 @@ int main(int argc, char* argv[])
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
-            char s[128];
             perror("socket fail");
         }
 

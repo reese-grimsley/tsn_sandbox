@@ -135,14 +135,67 @@ void thread_recv_jammer_data()
 
 void thread_recv_source_data()
 {
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+
+    struct ifreq ifr;
+    int rc;
+    char ctrl[4096] data[4096];
+    struct cmsghdr *cmsg = (struct cmsghdr *) &ctrl;
+    struct sockaddr_ll rcv_src_addr;
+    struct timespec ts;
+    struct msghdr msg;
+    struct iovec iov;
+
+    iov.iov_len = data;
+    iov.iov_len = 1500;
+
+    msg.msg_control = (char *) ctrl;
+    msg.msg_controllen = sizeof(ctrl);
+
+    msg.msg_name = &rcv_src_addr;
+    msg.msg_namelen = sizeof(rcv_src_addr);
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = iov.iov_len;
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_8021Q));
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
         exit(errno);    
     }
 
+    rc = get_eth_index_num(&ifr);
+    if (rc == -1)
+    {
+        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno)
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+    }
 
+    rc = configure_hw_timestamping(rcv_src_sock);
+    if (rc == -1)
+    {
+        printf("Failed to setup; shutdown. errno [%d]", errno)
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+
+    }
+
+    rcv_src_addr.sll_family = AF_PACKET;
+    rcv_src_addr.ssl_protocol = htons(ETH_P_8021Q);
+    rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
+    rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
+    rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
+
+    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+    memset(&(addr.sll_addr), 0, sizeof(addr.sll_addr));
+    memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
+
+
+    while(1)
+    {
+        recvmsg(rcv_src_sock, &msg, 0);
+
+        print_hex(msg.msg_iov->iov_base, msg.msg_iov->iov_len);
+    }
 
 
     pthread_exit(NULL);
