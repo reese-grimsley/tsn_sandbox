@@ -90,14 +90,16 @@ int main(int argc, char* argv[])
     int counter = 1;
     while(1)
     {
-        printf("send msg %d\t", counter);
-        int rc = 0;
-        // int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
+        // int rc = 0;
+        int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
             // perror("socket fail");
+            continue;
         }
+        printf("send msg %d of  %d bytes\t", counter, rc);
+
         int no_print = 0;
         wait(WAIT_DURATION, no_print);
         counter++;
