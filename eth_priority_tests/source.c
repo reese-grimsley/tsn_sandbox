@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     eth_frame.TCI.priority = 0;
     eth_frame.TCI.drop_indicator = 0; 
     eth_frame.TCI.vlan_id = 3; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
-    eth_frame.data_size_or_type = htons(ETH_P_802_3);
+    eth_frame.data_size_or_type = MAX_FRAME_DATA_LEN;
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
