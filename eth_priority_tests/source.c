@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
-            perror("socket fail");
+            // perror("socket fail");
         }
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
