@@ -189,11 +189,13 @@ void thread_recv_source_data()
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
     memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
+    struct ethernet_frame_8021Q_t frame;
 
     while(1)
     {
         recvmsg(rcv_src_sock, &msg, 0);
 
+        header_len = sizeof(frame) - sizeof(frame.data);
         print_hex(msg.msg_iov->iov_base, msg.msg_iov->iov_len);
     }
 
