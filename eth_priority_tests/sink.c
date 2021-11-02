@@ -189,7 +189,7 @@ void thread_recv_source_data()
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
     memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
-    struct ethernet_frame_8021Q_t frame;
+    struct ethernet_frame_8021Q frame;
 
     while(1)
     {
