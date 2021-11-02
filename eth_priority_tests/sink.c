@@ -196,22 +196,26 @@ void thread_recv_source_data()
 
     struct ethernet_frame_8021Q frame;
 
+    printf("Start steady state in sink of source-sink connection\n");
     while(1)
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
         if (msg_size == -1)
         {
-            printf("recvmsg signalled error: [%d]", errno);
-            continue;
+            printf("recvmsg signalled error: [%d]\n", errno);
         }
-        printf("Received message of length [%d]", msg_size);
-        
+        else
+        {
+            printf("Received message of length [%d]\n", msg_size);
+            
 
-        int header_len = sizeof(frame) - sizeof(frame.data);
-        int print_size = min(header_len, msg.msg_iov->iov_len);
-        print_hex(msg.msg_iov->iov_base, print_size);
-        printf("\n");
+            int header_len = sizeof(frame) - sizeof(frame.data);
+            int print_size = min(header_len, msg.msg_iov->iov_len);
+            print_hex(msg.msg_iov->iov_base, print_size);
+            printf("\n");
+        }
+
     }
 
 
