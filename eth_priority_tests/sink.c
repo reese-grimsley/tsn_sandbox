@@ -39,6 +39,9 @@
 #include "helpers.h"
 #include "types.h"
 
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+
+
 void thread_recv_jammer_with_timestamping()
 {
     struct msghdr msg;

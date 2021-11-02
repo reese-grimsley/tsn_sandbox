@@ -9,6 +9,8 @@ int configure_hw_timestamping(int sock_fd)
 
 
     flags   = SOF_TIMESTAMPING_RX_SOFTWARE
+            | SOF_TIMESTAMPING_TX_SOFTWARE
+            | SOF_TIMESTAMPING_TX_HARDWARE
             | SOF_TIMESTAMPING_RX_HARDWARE 
             | SOF_TIMESTAMPING_RAW_HARDWARE;
     if (setsockopt(sock_fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags)) < 0)
