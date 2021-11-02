@@ -145,7 +145,7 @@ void thread_recv_source_data()
     struct msghdr msg;
     struct iovec iov;
 
-    iov.iov_len = data;
+    iov.iov_base = data;
     iov.iov_len = 1500;
 
     msg.msg_control = (char *) ctrl;
@@ -203,14 +203,24 @@ void thread_recv_source_data()
 
 int main(int argc, char* argv[])
 {
-
+    int use_jammer = 0;
+    if (argc >=2 && strcmp(argv[1], "jam") == 0 )
+    {
+        use_jammer = 1;
+    }
 
     pthread_t recv_jammer, recv_source;
 
-    pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_with_timestamping, NULL);
+    if (use_jammer)
+    {
+        pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_with_timestamping, NULL);
+    }
     pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
 
-    pthread_join(recv_jammer, NULL);
+    if (use_jammer)
+    {
+        pthread_join(recv_jammer, NULL);
+    }
     pthread_join(recv_source, NULL);
 
     printf("Exiting sink\n");
