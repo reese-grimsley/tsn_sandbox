@@ -74,17 +74,18 @@ int main(int argc, char* argv[])
 
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
-    struct ethernet_frame_8021Q eth_frame;
+    // struct ethernet_frame_8021Q eth_frame;
+    struct ethernet_frame eth_frame;
     memset(&eth_frame, 0, sizeof(eth_frame));
 
 
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    eth_frame.TCI.TPID = htons(ETH_P_VLAN);
-    eth_frame.TCI.priority = 0;
-    eth_frame.TCI.drop_indicator = 0; 
-    eth_frame.TCI.vlan_id = 3; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    // eth_frame.TCI.TPID = htons(ETH_P_VLAN);
+    // eth_frame.TCI.priority = 0;
+    // eth_frame.TCI.drop_indicator = 0; 
+    // eth_frame.TCI.vlan_id = 3; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 

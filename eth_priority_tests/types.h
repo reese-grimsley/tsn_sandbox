@@ -19,6 +19,12 @@ struct ethernet_frame_8021Q
     char data[MAX_FRAME_DATA_LEN]; //technically, max per frame should be 1482 bytes; 18 byte header and MTU is is 1500
 };
 
-
+struct ethernet_frame
+{
+    char destination_mac[6];
+    char source_mac[6];
+    uint16_t data_size_or_type ; 
+    char data[MAX_FRAME_DATA_LEN]; //technically, max per frame should be 1482 bytes; 18 byte header and MTU is is 1500
+};
 
 #endif
