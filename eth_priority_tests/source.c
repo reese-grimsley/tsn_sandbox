@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         printf("did not find a valid ethernet interface named %s", ETH_INTERFACE_I225);
         return eth_interface_index;
     }
-    printf("Ethernet interface index %d", eth_interface_index);
+    printf("Ethernet interface index %d\n", eth_interface_index);
     
 
     addr.sll_family = AF_PACKET;
