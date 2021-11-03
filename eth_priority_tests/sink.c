@@ -150,6 +150,7 @@ void thread_recv_source_data()
     struct msghdr msg;
     struct iovec iov;
 
+    memset(data, 0, 4096);
     iov.iov_base = data;
     iov.iov_len = 4096;
 
