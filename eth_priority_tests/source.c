@@ -103,8 +103,9 @@ int main(int argc, char* argv[])
 
         printf("send msg %d of  %d bytes\t", counter, rc);
 
-        int no_print = 0;
+        int no_print = 1;
         wait(WAIT_DURATION, no_print);
+        fflush(stdout);
         counter++;
     }
 

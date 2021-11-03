@@ -202,6 +202,8 @@ void thread_recv_source_data()
     struct timespec now, start, diff;
 
     clock_gettime(CLOCK_REALTIME, &start);
+    printf("Started steady state at t=");
+    print_timespec(start);
     while(1)
     {
         int msg_size;
