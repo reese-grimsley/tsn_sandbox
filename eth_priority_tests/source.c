@@ -39,12 +39,15 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
+    int priority = 3;
+
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
     }   
+    setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
 
     struct sockaddr_ll addr;
     struct ifreq ifr;
@@ -54,14 +57,14 @@ int main(int argc, char* argv[])
     int eth_interface_index = get_eth_index_num(&ifr);
     if (eth_interface_index < 0)
     {
-        printf("did not find a valid ethernet interface named %s", ETH_INTERFACE_I225);
+        printf("did not find a valid ethernet interface named %s", IF_NAME);
         return eth_interface_index;
     }
     printf("Ethernet interface index %d\n", eth_interface_index);
     
 
     addr.sll_family = AF_PACKET;
-    addr.sll_protocol = htons(ETH_P_VLAN);
+    addr.sll_protocol = htons(ETH_P_TSN);
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;
@@ -82,14 +85,19 @@ int main(int argc, char* argv[])
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    // eth_frame.TCI.TPID = htons(ETH_P_VLAN);
-    // eth_frame.TCI.priority = 0;
-    // eth_frame.TCI.drop_indicator = 0; 
-    // eth_frame.TCI.vlan_id = 3; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    // eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
+    // eth_frame.TCI.tci_struct.TPID = htons(ETH_P_VLAN);
+    // eth_frame.TCI.tci_struct.priority = priority;
+    // eth_frame.TCI.tci_struct.drop_indicator = 0; 
+    // eth_frame.TCI.tci_struct.vlan_id = htons(3); //0 is null/void -- non-zero VLAN needs to be configured into the switch
+    // printf("TCI is 0x%08x\n", eth_frame.TCI.tci_int);
+ 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
+    print_hex((char*) &eth_frame, 32);
+    printf("\n");
     int counter = 1;
 
     while(1)
@@ -103,7 +111,7 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        printf("send msg %d of  %d bytes\t", counter, rc);
+        printf("send msg %d of  %d bytes\n", counter, rc);
 
         int no_print = 1;
         wait(WAIT_DURATION, no_print);

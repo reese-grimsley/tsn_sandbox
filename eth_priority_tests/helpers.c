@@ -24,7 +24,7 @@ int configure_hw_timestamping(int sock_fd)
     hwts_config.tx_type = HWTSTAMP_TX_ON;
     hwts_config.rx_filter = HWTSTAMP_FILTER_ALL;
     memset(&ifr, 0, sizeof(ifr));    
-    strncpy(ifr.ifr_name, ETH_INTERFACE_I225, sizeof(ifr.ifr_name));
+    strncpy(ifr.ifr_name, IF_NAME, sizeof(ifr.ifr_name));
     ifr.ifr_data = (void *)&hwts_config;
     if (ioctl(sock_fd , SIOCSHWTSTAMP, &ifr) == -1)
     {
@@ -70,8 +70,10 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
 
 int get_eth_index_num(struct ifreq* ifr)
 {
-    char* if_name = ETH_INTERFACE_I225;
-    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
+    char* if_name = IF_NAME;
+    size_t if_name_len = sizeof(IF_NAME);
+    // char* if_name = ETH_INTERFACE_I225_VLAN3;
+    // size_t if_name_len = sizeof(ETH_INTERFACE_I225_VLAN3);
 
     if (if_name_len < sizeof(ifr->ifr_name) ) 
     {
@@ -102,8 +104,8 @@ int get_eth_index_num(struct ifreq* ifr)
 int get_eth_mac_addr(struct ifreq* ifr)
 {
     int rc;
-    char* if_name = ETH_INTERFACE_I225;
-    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
+    char* if_name = IF_NAME;
+    size_t if_name_len = sizeof(IF_NAME);
 
     if (if_name_len < sizeof(ifr->ifr_name) ) 
     {
