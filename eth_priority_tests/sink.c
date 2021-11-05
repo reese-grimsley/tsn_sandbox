@@ -262,9 +262,16 @@ void thread_recv_source_data()
                     printf("NIC recevied at: ");
                     print_timespec(time_from_nic);
                     printf("\n");
+                    printf("Code received at: ");
+                    print_timespec(now);
+                    printf("\n");
                     memset(&t_prop, 0, sizeof(t_prop));
                     time_diff(&time_from_source, &time_from_nic, &t_prop);
-                    printf("Propagation time: ");
+                    printf("Propagation time (NIC): ");
+                    print_timespec(t_prop);
+                    printf("\n-----\n");
+                    time_diff(&time_from_source, &time_from_nic, &t_prop);
+                    printf("Propagation time (code): ");
                     print_timespec(t_prop);
                     printf("\n-----\n");
                     //TODO: add statistics and/or file-write
