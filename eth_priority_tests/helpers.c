@@ -159,16 +159,17 @@ void time_diff(const struct timespec * older_time, const struct timespec * newer
     //  }
 
     //  return diff;
-
+    print_timespec(*older_time); printf("\n");
+    print_timespec(*newer_time);printf("\n");
     if ((newer_time->tv_nsec - older_time->tv_nsec)<0)
     {
-            diff->tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
-            diff->tv_nsec = 1000000000 + newer_time->tv_nsec - older_time->tv_nsec;
+        diff->tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
+        diff->tv_nsec = 1000000000 + newer_time->tv_nsec - older_time->tv_nsec;
     }
     else 
     {
-            diff->tv_sec = newer_time->tv_sec - older_time->tv_sec;
-            diff->tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
+        diff->tv_sec = newer_time->tv_sec - older_time->tv_sec;
+        diff->tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
     }
     print_timespec(*diff);
 }
