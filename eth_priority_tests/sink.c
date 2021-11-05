@@ -249,7 +249,7 @@ void thread_recv_source_data()
             {
                 //this is a frame we want.
                 printf("THIS FRAME IS INTERESTING!!\n");
-                ethernet_frame frame;
+                struct ethernet_frame frame;
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iovlen));
                 struct timespec time_from_source, time_from_nic, t_prop;
                 memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
