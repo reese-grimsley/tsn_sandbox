@@ -162,6 +162,7 @@ void thread_recv_source_data()
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
     // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if( rcv_src_sock == -1)
     {
@@ -176,6 +177,7 @@ void thread_recv_source_data()
         shutdown(rcv_src_sock, 2);
         exit(errno);
     }
+    printf("Using network interface %d\n", ifr.ifr_ifindex);
 
     rc = configure_hw_timestamping(rcv_src_sock);
     if (rc == -1)
@@ -187,11 +189,23 @@ void thread_recv_source_data()
     }
 
     rcv_src_addr.sll_family = AF_PACKET;
+    // rcv_src_addr.sll_protocol = htons(ETH_P_ALL);
     // rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
     rcv_src_addr.sll_protocol = htons(ETH_P_TSN);
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
+
+    // if (bind((int)rcv_src_sock, (struct sockaddr *) &rcv_src_addr, sizeof(rcv_src_addr)) < 0) {
+    //     printf("Start(): bind() failed! error: %d",errno);
+    //     exit(errno);
+    // }
+    char if_name[20] = IF_NAME;
+    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
+		perror("SO_BINDTODEVICE");
+		shutdown(rcv_src_sock,2);
+		exit(errno);
+	}
 
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
@@ -205,14 +219,16 @@ void thread_recv_source_data()
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
     print_timespec(start);
+    printf("\n");
+    fflush(stdout);
     while(1)
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
         clock_gettime(CLOCK_REALTIME, &now);
-        if (msg_size == -1)
+        if (msg_size == -1 || (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == 0x0008) //also ignore IP
         {
-            printf("recvmsg signalled error: [%d]\n", errno);
+            // printf("recvmsg signalled error: [%d]\n", errno);
         }
         else
         {
@@ -221,10 +237,9 @@ void thread_recv_source_data()
 
             int header_len = sizeof(frame) - sizeof(frame.data);
             int print_size = min(header_len, msg.msg_iov->iov_len);
-            print_hex(msg.msg_iov->iov_base, print_size);
-            printf("\n");
-            // print_hex(buf, msg_size);
-            printf("\n");
+            printf("protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
+            print_hex(msg.msg_iov->iov_base, print_size+20);
+            printf("\n"); 
             printf("time since start: ");
             diff = time_diff(&start, &now);
             print_timespec(diff);
