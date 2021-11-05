@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ `whoami` != "root" ]]; then
+    echo "Run as root/sudo!"; exit -1;
+fi
+
 sudo ptp4l -f ptp_client.conf -i enp87s0 -m >> ptp.log &
 echo "ptp4l is running in bg as pid $!"
 
