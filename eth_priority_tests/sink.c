@@ -177,7 +177,7 @@ void thread_recv_source_data()
         shutdown(rcv_src_sock, 2);
         exit(errno);
     }
-    printf("Using network interface %d\n", ifr.ifr_index);
+    printf("Using network interface %d\n", ifr_ifindex);
 
     rc = configure_hw_timestamping(rcv_src_sock);
     if (rc == -1)
