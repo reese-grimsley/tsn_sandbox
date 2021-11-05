@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
         memcpy(eth_frame.data+1, (void*) &now, sizeof(now));
-        eth_frame.data+1+sizeof(now) = '\0';
+        eth_frame.data[1+sizeof(now)] = '\0';
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
