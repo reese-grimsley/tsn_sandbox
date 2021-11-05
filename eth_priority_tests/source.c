@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int priority = 0;
+    int priority = 5;
 
     int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
