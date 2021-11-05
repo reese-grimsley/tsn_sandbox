@@ -196,10 +196,10 @@ void thread_recv_source_data()
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
 
-    if (bind((int)rcv_src_sock, (struct sockaddr *) &rcv_src_addr, sizeof(rcv_src_addr)) < 0) {
-        printf("Start(): bind() failed! error: %d",errno);
-        exit(errno);
-    }
+    // if (bind((int)rcv_src_sock, (struct sockaddr *) &rcv_src_addr, sizeof(rcv_src_addr)) < 0) {
+    //     printf("Start(): bind() failed! error: %d",errno);
+    //     exit(errno);
+    // }
 
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
