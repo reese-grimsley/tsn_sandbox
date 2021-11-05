@@ -214,9 +214,9 @@ void thread_recv_source_data()
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
         clock_gettime(CLOCK_REALTIME, &now);
-        if (msg_size == -1)
+        if (msg_size == -1 || (struct sockaddr_ll*) msg.msg_name)->sll_protocol == 0x0008)
         {
-            printf("recvmsg signalled error: [%d]\n", errno);
+            // printf("recvmsg signalled error: [%d]\n", errno);
         }
         else
         {
