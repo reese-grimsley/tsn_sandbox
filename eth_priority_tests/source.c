@@ -32,7 +32,7 @@
 #include "types.h"
 
 
-struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 500000000};
+struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 750000000};
 
 
 int main(int argc, char* argv[])
@@ -116,7 +116,9 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        printf("send msg %d of  %d bytes\n", counter, rc);
+        printf("send msg %d of  %d bytes at ", counter, rc);
+        print_timespec(now);
+        printf("\n");
 
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
