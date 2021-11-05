@@ -85,6 +85,7 @@ int main(int argc, char* argv[])
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
+    eth_frame.TCI = (tag_control_t) (htonl((ETH_P_VLAN << 16) | priority << 3 | VLAN_ID));
     eth_frame.TCI.TPID = htons(ETH_P_VLAN);
     eth_frame.TCI.priority = priority;
     eth_frame.TCI.drop_indicator = 0; 
