@@ -215,6 +215,8 @@ void thread_recv_source_data()
 
     printf("Start steady state in sink of source-sink connection\n");
     struct timespec now, start, diff;
+    struct timespec time_from_source, time_from_nic, t_prop;
+
 
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
@@ -251,13 +253,15 @@ void thread_recv_source_data()
                 printf("THIS FRAME IS INTERESTING!!\n");
                 struct ethernet_frame frame;
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iovlen));
-                struct timespec time_from_source, time_from_nic, t_prop;
                 memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
                 printf("Source sent at: ");
                 print_timespec(time_from_source);
                 printf("\n");
                 if (get_hw_timestamp_from_msg(&msg, &ts))
                 {
+                    printf("NIC recevied at: ");
+                    print_timespec(time_from_source);
+                    printf("\n");
                     t_prop = time_diff(&time_from_source, &time_from_nic);
                     printf("Propagation time: ");
                     print_timespec(t_prop);
