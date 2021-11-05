@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     eth_frame.TCI.TPID = htons(ETH_P_VLAN);
     eth_frame.TCI.priority = priority;
     eth_frame.TCI.drop_indicator = 0; 
-    eth_frame.TCI.vlan_id = 3; //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    eth_frame.TCI.vlan_id = htons(3); //0 is null/void -- non-zero VLAN needs to be configured into the switch 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
