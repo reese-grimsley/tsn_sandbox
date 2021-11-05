@@ -203,7 +203,7 @@ void thread_recv_source_data()
     char if_name[20] = IF_NAME;
     if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
 		perror("SO_BINDTODEVICE");
-		close(rcv_src_sock);
+		shutdown(rcv_src_sock,2);
 		exit(errno);
 	}
 
