@@ -26,6 +26,6 @@
 //From openAVNU; does not seem to correspond to any well-known types of ethernet message/protocol.
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/if_ether.h
 #define MVRP_ETYPE 0x88F5 //this one exists in the kernel
-#define MSRP_ETYPE 0x22EA // close to ETH_TSN
+#define MSRP_ETYPE 0x22EA // close to ETH_TSN (0x22f0)
 #define MMRP_ETYPE 0x88F6
 #define ETH_P_VLAN ETH_P_8021Q // or ETH_P_8021AD?
