@@ -39,12 +39,15 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
+    int priority = 3;
+
     int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
     }   
+    setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
 
     struct sockaddr_ll addr;
     struct ifreq ifr;
