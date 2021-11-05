@@ -1,5 +1,6 @@
 #include "helpers.h"
 
+// doesn't appear to work; returns 0. To really be accurate, probably needs a connection to an NTP server of similar, which an NTP client like chrony will update according (i.e., tai_offset will be updated)
 int get_num_leapseconds(void)
 {
     struct timespec utc, tai, diff;
