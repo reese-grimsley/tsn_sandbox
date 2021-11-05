@@ -206,6 +206,7 @@ void thread_recv_source_data()
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
     print_timespec(start);
+    fflush(stdout);
     while(1)
     {
         int msg_size;
