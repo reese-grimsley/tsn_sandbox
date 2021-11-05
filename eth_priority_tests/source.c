@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
+    printf("TCI is 0x%08x", eth_frame.TCI.tci_int);
     int counter = 1;
 
     while(1)
