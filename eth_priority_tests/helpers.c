@@ -136,7 +136,7 @@ void print_timespec(const struct timespec ts)
  * 
  * source: https://www.guyrutenberg.com/2007/09/22/profiling-code-using-clock_gettime/
  */ 
-void timespec time_diff(const struct timespec * older_time, const struct timespec * newer_time, struct timespec* diff)
+void time_diff(const struct timespec * older_time, const struct timespec * newer_time, struct timespec* diff)
 {
     //  struct timespec diff;
     //  diff.tv_sec = newer_time->tv_sec - older_time->tv_sec;
