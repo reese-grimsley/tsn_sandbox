@@ -252,7 +252,7 @@ void thread_recv_source_data()
                 printf("THIS FRAME IS INTERESTING!!\n");
                 struct ethernet_frame frame;
                 print_hex(frame.data+1, sizeof(struct timespec));
-                memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iovlen));
+                memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
                 memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
                 printf("Source sent at: ");
                 print_timespec(time_from_source);
