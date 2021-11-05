@@ -70,8 +70,8 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
 
 int get_eth_index_num(struct ifreq* ifr)
 {
-    char* if_name = ETH_INTERFACE_I225;
-    size_t if_name_len = sizeof(ETH_INTERFACE_I225);
+    char* if_name = ETH_INTERFACE_I225_VLAN3;
+    size_t if_name_len = sizeof(ETH_INTERFACE_I225_VLAN3);
     // char* if_name = ETH_INTERFACE_I225_VLAN3;
     // size_t if_name_len = sizeof(ETH_INTERFACE_I225_VLAN3);
 
