@@ -269,7 +269,10 @@ void thread_recv_source_data()
                     time_diff(&time_from_source, &time_from_nic, &t_prop);
                     printf("Propagation time (NIC): ");
                     print_timespec(t_prop);
-                    printf("\n-----\n");
+                    t_prop.tv_sec -= get_num_leapseconds();
+                    printf("Propagation time (NIC, corrected for UTC): ");
+                    print_timespec(t_prop);
+                    printf("\n");
                     time_diff(&time_from_source, &now, &t_prop);
                     printf("Propagation time (code): ");
                     print_timespec(t_prop);

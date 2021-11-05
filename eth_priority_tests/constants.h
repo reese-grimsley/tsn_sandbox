@@ -21,7 +21,8 @@
 #define MAX_FRAME_DATA_LEN 1350
 #define MAX_UDP_PACKET_SIZE 1350
 
-
+//37 as of Nov. 5 2021. This will change. Should be updated or read from the system. NICs are sync'd to TAI which is LEAP_SECONDS_FFSET ahead of UTC, which the RTC/CLOCK_REALTIME reads.
+#define LEAP_SECONDS_OFFSET 37 
 
 //From openAVNU; does not seem to correspond to any well-known types of ethernet message/protocol.
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/if_ether.h

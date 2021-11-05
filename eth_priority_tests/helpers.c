@@ -1,5 +1,20 @@
 #include "helpers.h"
 
+int get_num_leapseconds(void)
+{
+    struct timespec utc, tai, diff;
+    int offset;
+
+    clock_gettime(CLOCK_REALTIME, &utc);
+    clock_gettime(CLOCK_TAI, &tai);
+
+    time_diff(&utc, &tai, &diff);
+
+    offset = diff.tv_sec;
+    if (diff.tv_nsec > 500000000) offset++;
+
+    return offset;
+}
 
 int configure_hw_timestamping(int sock_fd)
 {
