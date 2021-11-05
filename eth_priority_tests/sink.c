@@ -234,7 +234,7 @@ void thread_recv_source_data()
         {
             printf("Received message of length [%d]\n", msg_size);
             
-
+            //if this came within a 802.1Q frame, the offsets will need to change to account for ethernet addresses
             int header_len = sizeof(frame) - sizeof(frame.data);
             int print_size = min(header_len, msg.msg_iov->iov_len);
             printf("protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
@@ -249,6 +249,22 @@ void thread_recv_source_data()
             {
                 //this is a frame we want.
                 printf("THIS FRAME IS INTERESTING!!\n");
+                ethernet_frame frame;
+                memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iovlen));
+                struct timespec time_from_source, time_from_nic, t_prop;
+                memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
+                printf("Source sent at: ");
+                print_timespec(time_from_source);
+                printf("\n");
+                if (get_hw_timestamp_from_msg(&msg, &ts))
+                {
+                    t_prop = time_diff(&time_from_source, &time_from_nic);
+                    printf("Propagation time: ");
+                    print_timespec(t_prop);
+                    printf("\n");
+                    //TODO: add statistics and/or file-write
+                }
+
             }
 
             fflush(stdout);

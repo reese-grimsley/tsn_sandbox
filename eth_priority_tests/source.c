@@ -105,6 +105,7 @@ int main(int argc, char* argv[])
     {
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
+        eth_frame.data[0] = '\0';
         memcpy(eth_frame.data+1, (void*) &now, sizeof(now));
         eth_frame.data[1+sizeof(now)] = '\0';
 
