@@ -12,6 +12,7 @@
 #define SINK_PORT 15810
 
 #define ETH_INTERFACE_I225 "enp87s0\0"
+#define ETH_INTERFACE_I225_VLAN3 "enp87s0.3\0"
 
 #define MAX_FRAME_SIZE 1500
 #define MAX_FRAME_DATA_LEN 1350
@@ -24,4 +25,4 @@
 #define MVRP_ETYPE 0x88F5 //this one exists in the kernel
 #define MSRP_ETYPE 0x22EA // close to ETH_TSN
 #define MMRP_ETYPE 0x88F6
-#define ETH_P_VLAN ETH_P_8021Q // or ETH_P_8021AD
+#define ETH_P_VLAN ETH_P_8021Q // or ETH_P_8021AD?
