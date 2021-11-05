@@ -260,7 +260,7 @@ void thread_recv_source_data()
                 if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
                 {
                     printf("NIC recevied at: ");
-                    print_timespec(time_from_source);
+                    print_timespec(time_from_nic);
                     printf("\n");
                     memset(&t_prop, 0, sizeof(t_prop));
                     time_diff(&time_from_source, &time_from_nic, &t_prop);
