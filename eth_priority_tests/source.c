@@ -57,14 +57,14 @@ int main(int argc, char* argv[])
     int eth_interface_index = get_eth_index_num(&ifr);
     if (eth_interface_index < 0)
     {
-        printf("did not find a valid ethernet interface named %s", ETH_INTERFACE_I225);
+        printf("did not find a valid ethernet interface named %s", IF_NAME);
         return eth_interface_index;
     }
     printf("Ethernet interface index %d\n", eth_interface_index);
     
 
     addr.sll_family = AF_PACKET;
-    addr.sll_protocol = htons(ETH_P_VLAN);
+    addr.sll_protocol = htons(ETH_P_TSN);
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;
