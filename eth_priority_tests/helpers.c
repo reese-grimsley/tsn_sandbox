@@ -136,7 +136,7 @@ void print_timespec(const struct timespec ts)
  * 
  * source: https://www.guyrutenberg.com/2007/09/22/profiling-code-using-clock_gettime/
  */ 
-struct timespec time_diff(const struct timespec * older_time, const struct timespec * newer_time)
+void timespec time_diff(const struct timespec * older_time, const struct timespec * newer_time, struct timespec* diff)
 {
     //  struct timespec diff;
     //  diff.tv_sec = newer_time->tv_sec - older_time->tv_sec;
@@ -159,19 +159,18 @@ struct timespec time_diff(const struct timespec * older_time, const struct times
     //  }
 
     //  return diff;
-    struct timespec temp;
 
     if ((newer_time->tv_nsec - older_time->tv_nsec)<0)
     {
-            temp.tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
-            temp.tv_nsec = 1000000000 + newer_time->tv_nsec - older_time->tv_nsec;
+            diff.tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
+            diff.tv_nsec = 1000000000 + newer_time->tv_nsec - older_time->tv_nsec;
     }
     else 
     {
-            temp.tv_sec = newer_time->tv_sec - older_time->tv_sec;
-            temp.tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
+            diff.tv_sec = newer_time->tv_sec - older_time->tv_sec;
+            diff.tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
     }
-    return temp;
+    return diff;
 }
 
 
@@ -201,7 +200,7 @@ int wait_until(struct timespec wake_time, int no_print)
 
     clock_gettime(CLOCK_REALTIME, &current_time);
 
-    sleep_duration = time_diff(&current_time, &wake_time);
+    time_diff(&current_time, &wake_time, &sleep_duration);
     return wait(sleep_duration, no_print);
 }
 

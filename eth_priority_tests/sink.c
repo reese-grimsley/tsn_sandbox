@@ -242,19 +242,19 @@ void thread_recv_source_data()
             print_hex(msg.msg_iov->iov_base, print_size+20);
             printf("\n"); 
             printf("time since start: ");
-            diff = time_diff(&start, &now);
+            time_diff(&start, &now, &diff);
             print_timespec(diff);
             printf("\n\n");
 
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
                 //this is a frame we want.
-                printf("THIS FRAME IS INTERESTING!!\n");
+                printf("THIS FRAME IS INTERESTING!!\n-----\n");
                 struct ethernet_frame frame;
                 print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
                 memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
-                printf("Source sent at: ");
+                printf("Source sent at:  ");
                 print_timespec(time_from_source);
                 printf("\n");
                 if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
@@ -262,10 +262,11 @@ void thread_recv_source_data()
                     printf("NIC recevied at: ");
                     print_timespec(time_from_source);
                     printf("\n");
-                    t_prop = time_diff(&time_from_source, &time_from_nic);
+                    memset(&t_prop, 0, sizeof(t_prop));
+                    time_diff(&time_from_source, &time_from_nic, &t_prop);
                     printf("Propagation time: ");
                     print_timespec(t_prop);
-                    printf("\n");
+                    printf("\n-----\n");
                     //TODO: add statistics and/or file-write
                 }
 
