@@ -170,6 +170,7 @@ void time_diff(const struct timespec * older_time, const struct timespec * newer
             diff->tv_sec = newer_time->tv_sec - older_time->tv_sec;
             diff->tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
     }
+    print_timespec(*diff);
 }
 
 
