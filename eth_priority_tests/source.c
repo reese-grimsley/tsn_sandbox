@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 3 | VLAN_ID));
+    eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
     // eth_frame.TCI.tci_struct.TPID = htons(ETH_P_VLAN);
     // eth_frame.TCI.tci_struct.priority = priority;
     // eth_frame.TCI.tci_struct.drop_indicator = 0; 
@@ -94,7 +94,9 @@ int main(int argc, char* argv[])
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
-    printf("TCI is 0x%08x", eth_frame.TCI.tci_int);
+    printf("TCI is 0x%08x\n", eth_frame.TCI.tci_int);
+    print_hex((char*) &eth_frame, 32);
+    printf("\n");
     int counter = 1;
 
     while(1)
