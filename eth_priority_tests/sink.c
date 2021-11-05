@@ -243,7 +243,7 @@ void thread_recv_source_data()
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
                 //this is a frame we want.
-                printf("TSN frame!\n-----\n");
+                printf("TSN frame!\n");
                 struct ethernet_frame frame;
                 // print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
