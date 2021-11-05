@@ -197,7 +197,7 @@ void thread_recv_source_data()
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
 
     if (bind((int)rcv_src_sock, (struct sockaddr *) &rcv_src_addr, sizeof(rcv_src_addr)) < 0) {
-        printf("EthRawSock", "Start(): bind() failed! error: %d",errno);
+        printf("Start(): bind() failed! error: %d",errno);
         exit(errno);
     }
 
