@@ -162,8 +162,8 @@ void thread_recv_source_data()
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
-    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
@@ -188,7 +188,7 @@ void thread_recv_source_data()
     }
 
     rcv_src_addr.sll_family = AF_PACKET;
-    rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
+    rcv_src_addr.sll_protocol = htons(ETH_P_ALL);
     // rcv_src_addr.sll_protocol = htons(ETH_P_TSN);
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
@@ -206,6 +206,7 @@ void thread_recv_source_data()
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
     print_timespec(start);
+    printf("\n");
     fflush(stdout);
     while(1)
     {
