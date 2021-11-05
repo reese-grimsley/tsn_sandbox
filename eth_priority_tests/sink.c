@@ -200,6 +200,12 @@ void thread_recv_source_data()
     //     printf("Start(): bind() failed! error: %d",errno);
     //     exit(errno);
     // }
+    char if_name[20] = IF_NAME;
+    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
+		perror("SO_BINDTODEVICE");
+		close(rcv_src_sock);
+		exit(errno);
+	}
 
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
