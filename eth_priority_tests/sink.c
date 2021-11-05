@@ -224,7 +224,7 @@ void thread_recv_source_data()
 
             int header_len = sizeof(frame) - sizeof(frame.data);
             int print_size = min(header_len, msg.msg_iov->iov_len);
-            print_hex(msg.msg_iov->iov_base, print_size);
+            print_hex(msg.msg_iov->iov_base, print_size+20);
             printf("\n");
             // print_hex(buf, msg_size);
             printf("\n");
