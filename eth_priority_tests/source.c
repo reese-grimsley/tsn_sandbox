@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        printf("send msg %d of  %d bytes\t", counter, rc);
+        printf("send msg %d of  %d bytes\n", counter, rc);
 
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
