@@ -161,9 +161,9 @@ void thread_recv_source_data()
     msg.msg_namelen = sizeof(rcv_src_addr);
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
-    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
