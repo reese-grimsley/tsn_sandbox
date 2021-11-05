@@ -226,7 +226,7 @@ void thread_recv_source_data()
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
         clock_gettime(CLOCK_REALTIME, &now);
-        if (msg_size == -1 || ((struct sockaddr_ll*) msg.msg_name)->sll_protocol == 0x0008)
+        if (msg_size == -1)
         {
             // printf("recvmsg signalled error: [%d]\n", errno);
         }
@@ -245,7 +245,7 @@ void thread_recv_source_data()
             diff = time_diff(&start, &now);
             print_timespec(diff);
             printf("\n\n");
-            printf("protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);
+            printf("protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
             fflush(stdout);
         }
 

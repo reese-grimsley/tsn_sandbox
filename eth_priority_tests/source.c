@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     //configure the socket
     int priority = 3;
 
-    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
+    int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
@@ -77,24 +77,25 @@ int main(int argc, char* argv[])
 
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
-    struct ethernet_frame_8021Q eth_frame;
-    // struct ethernet_frame eth_frame;
+    // struct ethernet_frame_8021Q eth_frame;
+    struct ethernet_frame eth_frame;
     memset(&eth_frame, 0, sizeof(eth_frame));
 
 
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
-    eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
+    // eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
     // eth_frame.TCI.tci_struct.TPID = htons(ETH_P_VLAN);
     // eth_frame.TCI.tci_struct.priority = priority;
     // eth_frame.TCI.tci_struct.drop_indicator = 0; 
-    // eth_frame.TCI.tci_struct.vlan_id = htons(3); //0 is null/void -- non-zero VLAN needs to be configured into the switch 
+    // eth_frame.TCI.tci_struct.vlan_id = htons(3); //0 is null/void -- non-zero VLAN needs to be configured into the switch
+    // printf("TCI is 0x%08x\n", eth_frame.TCI.tci_int);
+ 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
     memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
 
     printf("Start source side of source-sink connection\n");
-    printf("TCI is 0x%08x\n", eth_frame.TCI.tci_int);
     print_hex((char*) &eth_frame, 32);
     printf("\n");
     int counter = 1;
