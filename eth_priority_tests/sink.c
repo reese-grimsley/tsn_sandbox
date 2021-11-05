@@ -260,50 +260,6 @@ void thread_recv_source_data()
                 }
 
             }
-
-            print_hex(msg.msg_iov->iov_base, print_size+20);
-            printf("\n"); 
-            printf("time since start: ");
-            time_diff(&start, &now, &diff);
-            print_timespec(diff);
-            printf("\n\n");
-
-            if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
-            {
-                //this is a frame we want.
-                printf("THIS FRAME IS INTERESTING!!\n-----\n");
-                struct ethernet_frame frame;
-                print_hex(frame.data, sizeof(struct timespec)); printf("\n");
-                memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
-                memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
-                printf("Source sent at:  ");
-                print_timespec(time_from_source);
-                printf("\n");
-                if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
-                {
-                    printf("NIC recevied at: ");
-                    print_timespec(time_from_nic);
-                    printf("\n");
-                    printf("Code received at: ");
-                    print_timespec(now);
-                    printf("\n");
-                    memset(&t_prop, 0, sizeof(t_prop));
-                    time_diff(&time_from_source, &time_from_nic, &t_prop);
-                    printf("Propagation time (NIC): ");
-                    print_timespec(t_prop);
-                    t_prop.tv_sec -= MAX(get_num_leapseconds(), LEAP_SECONDS_OFFSET);
-                    printf("Propagation time (NIC, corrected for UTC): ");
-                    print_timespec(t_prop);
-                    printf("\n");
-                    time_diff(&time_from_source, &now, &t_prop);
-                    printf("Propagation time (code): ");
-                    print_timespec(t_prop);
-                    printf("\n-----\n");
-                    //TODO: add statistics and/or file-write
-                }
-
-            }
-
             fflush(stdout);
         }
 
