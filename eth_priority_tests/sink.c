@@ -188,8 +188,8 @@ void thread_recv_source_data()
     }
 
     rcv_src_addr.sll_family = AF_PACKET;
-    // rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
     rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
+    // rcv_src_addr.sll_protocol = htons(ETH_P_TSN);
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
