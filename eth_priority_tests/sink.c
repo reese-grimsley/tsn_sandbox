@@ -233,6 +233,7 @@ void thread_recv_source_data()
             diff = time_diff(&start, &now);
             print_timespec(diff);
             printf("\n\n");
+            printf("protocol: %d\n",((sockaddr_ll)msg.msg_name).protocol);
             fflush(stdout);
         }
 
