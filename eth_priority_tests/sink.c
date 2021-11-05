@@ -244,6 +244,13 @@ void thread_recv_source_data()
             diff = time_diff(&start, &now);
             print_timespec(diff);
             printf("\n\n");
+
+            if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
+            {
+                //this is a frame we want.
+                printf("THIS FRAME IS INTERESTING!!\n");
+            }
+
             fflush(stdout);
         }
 
