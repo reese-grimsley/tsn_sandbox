@@ -177,6 +177,7 @@ void thread_recv_source_data()
         shutdown(rcv_src_sock, 2);
         exit(errno);
     }
+    printf("Using network interface %d\n", ifr.ifr_index);
 
     rc = configure_hw_timestamping(rcv_src_sock);
     if (rc == -1)
@@ -194,6 +195,11 @@ void thread_recv_source_data()
     rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
+
+    if (bind((int)rcv_src_sock, (struct sockaddr *) &rcv_src_addr, sizeof(rcv_src_addr)) < 0) {
+        printf("EthRawSock", "Start(): bind() failed! error: %d",errno);
+        exit(errno);
+    }
 
     char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
