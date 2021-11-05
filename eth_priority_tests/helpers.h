@@ -25,12 +25,19 @@
 #include "constants.h"
 #include "types.h"
 
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define MIN min
+#define MAX max
+
+
+int get_num_leapseconds(void); // doesn't appear to work; returns 0. To really be accurate, probably needs a connection to an NTP server of similar, which an NTP client like chrony will update according (i.e., tai_offset will be updated)
 int configure_hw_timestamping(int sock_fd);
 int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts);
 int get_eth_index_num(struct ifreq* ifr);
 
 void print_timespec(const struct timespec ts);
-struct timespec time_diff(const struct timespec * last_time, const struct timespec * current_time);
+void time_diff(const struct timespec * last_time, const struct timespec * current_time, struct timespec* diff);
 int wait_until(struct timespec ts, int no_print);
 int wait(struct timespec sleep_duration, int no_print);
 

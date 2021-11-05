@@ -32,7 +32,7 @@
 #include "types.h"
 
 
-struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 500000000};
+struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 750000000};
 
 
 int main(int argc, char* argv[])
@@ -99,10 +99,16 @@ int main(int argc, char* argv[])
     print_hex((char*) &eth_frame, 32);
     printf("\n");
     int counter = 1;
+    struct timespec now;
 
     while(1)
     {
-        // int rc = 0;
+        // add timestamp to frame
+        clock_gettime(CLOCK_REALTIME, &now);
+        eth_frame.data[0] = '\0';
+        memcpy(eth_frame.data+1, (void*) &now, sizeof(now));
+        eth_frame.data[1+sizeof(now)] = '\0';
+
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
         {
@@ -111,7 +117,9 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        printf("send msg %d of  %d bytes\n", counter, rc);
+        printf("send msg %d of  %d bytes at ", counter, rc);
+        print_timespec(now);
+        printf("\n");
 
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
