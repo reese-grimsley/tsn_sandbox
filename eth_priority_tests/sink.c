@@ -217,7 +217,6 @@ void thread_recv_source_data()
     struct timespec now, start, diff;
     struct timespec time_from_source, time_from_nic, t_prop;
 
-
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
     print_timespec(start);
@@ -252,6 +251,7 @@ void thread_recv_source_data()
                 //this is a frame we want.
                 printf("THIS FRAME IS INTERESTING!!\n");
                 struct ethernet_frame frame;
+                print_hex(frame.data+1, sizeof(struct timespec));
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iovlen));
                 memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
                 printf("Source sent at: ");
