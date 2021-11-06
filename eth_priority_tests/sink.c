@@ -161,7 +161,7 @@ void thread_recv_source_data()
     msg.msg_namelen = sizeof(rcv_src_addr);
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
+    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_IP));
     // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
     // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if( rcv_src_sock == -1)
@@ -261,6 +261,12 @@ void thread_recv_source_data()
 
             }
 
+            print_hex(msg.msg_iov->iov_base, print_size+20);
+            printf("\n"); 
+            printf("time since start: ");
+            diff = time_diff(&start, &now);
+            print_timespec(diff);
+            printf("\n\n");
             fflush(stdout);
         }
 
