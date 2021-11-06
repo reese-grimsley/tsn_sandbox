@@ -233,3 +233,13 @@ void print_hex(const char* str, int len)
     }
     
 }
+
+int open_latency_csv(char* filename, int filelen)
+{
+    return 0;
+}
+
+int write_timespec_to_csv(int csv_fd, const struct timespec ts)
+{
+    return 0;
+}

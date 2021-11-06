@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <random.h>
 
 #include "constants.h"
 #include "helpers.h"
@@ -39,7 +40,8 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int priority = 5;
+    int8_t priority = 5;
+    int32_t test_id = random();
 
     int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
     if( send_sock == -1)
@@ -93,21 +95,23 @@ int main(int argc, char* argv[])
     // printf("TCI is 0x%08x\n", eth_frame.TCI.tci_int);
  
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
-    memset(&eth_frame.data, 'q', MAX_FRAME_DATA_LEN);
+    memset(&(eth_frame.payload+sizeof(struct source_sink_payload)), 'q', sizeof(eth_frame.payload) - sizeof(struct source_sink_payload));
+    eth_frame.payload.ss_payload.test_id = test_id;
+    eth_frame.payload.ss_payload.frame_priority = priority;
 
     printf("Start source side of source-sink connection\n");
     print_hex((char*) &eth_frame, 32);
     printf("\n");
-    int counter = 1;
+    int counter = 0;
     struct timespec now;
 
     while(1)
     {
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
-        eth_frame.data[0] = '\0';
-        memcpy(eth_frame.data+1, (void*) &now, sizeof(now));
-        eth_frame.data[1+sizeof(now)] = '\0';
+        memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
+        eth_frame.payload.ss_payload.frame_id = counter;
+
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)

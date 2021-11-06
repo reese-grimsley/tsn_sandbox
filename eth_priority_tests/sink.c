@@ -39,8 +39,6 @@
 #include "helpers.h"
 #include "types.h"
 
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-
 
 void thread_recv_jammer_with_timestamping()
 {
@@ -196,10 +194,6 @@ void thread_recv_source_data()
     rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
     rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
 
-    // if (bind((int)rcv_src_sock, (struct sockaddr *) &rcv_src_addr, sizeof(rcv_src_addr)) < 0) {
-    //     printf("Start(): bind() failed! error: %d",errno);
-    //     exit(errno);
-    // }
     char if_name[20] = IF_NAME;
     if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
 		perror("SO_BINDTODEVICE");
@@ -211,8 +205,6 @@ void thread_recv_source_data()
     memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
     memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
-    struct ethernet_frame_8021Q frame;
-
     printf("Start steady state in sink of source-sink connection\n");
     struct timespec now, start, diff;
     struct timespec time_from_source, time_from_nic, t_prop;
@@ -222,7 +214,9 @@ void thread_recv_source_data()
     print_timespec(start);
     printf("\n");
     fflush(stdout);
-    while(1)
+
+    //TODO: open data csv file
+    while(1) // TODO: while some volatile value set by SIG handler false... 
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
@@ -236,8 +230,6 @@ void thread_recv_source_data()
             printf("Received message of length [%d]\n", msg_size);
             
             //if this came within a 802.1Q frame, the offsets will need to change to account for ethernet addresses
-            int header_len = sizeof(frame) - sizeof(frame.data);
-            int print_size = min(header_len, msg.msg_iov->iov_len);
             printf("receive message with protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
 
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
@@ -247,7 +239,7 @@ void thread_recv_source_data()
                 struct ethernet_frame frame;
                 // print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
-                memcpy(&time_from_source, frame.data+1, sizeof(struct timespec));
+                memcpy(&time_from_source, frame.payload.ss_payload.tx_time, sizeof(struct timespec));
                 if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
                 {
                     memset(&t_prop, 0, sizeof(t_prop));
@@ -256,7 +248,11 @@ void thread_recv_source_data()
                     printf("Propagation time (NIC, corrected for UTC): ");
                     print_timespec(t_prop);
                     printf("\n-----\n");
+
                     //TODO: add statistics and/or file-write
+
+
+                    //break if counter from frame < current one held here.       
                 }
 
             }
@@ -265,6 +261,8 @@ void thread_recv_source_data()
         }
 
     }
+
+    //TODO: close data csv file
 
 
     pthread_exit(NULL);

@@ -10,6 +10,14 @@ typedef struct tag_control
     unsigned int vlan_id : 12;
 } tag_control_t;
 
+struct source_sink_payload
+{
+    int32_t test_id;
+    int32_t frame_id;
+    int32_t frame_priority;
+    struct timespec tx_time;
+};
+
 struct ethernet_frame_8021Q
 {
     char destination_mac[6];
@@ -21,7 +29,12 @@ struct ethernet_frame_8021Q
     } TCI;
     // tag_control_t TCI; // highest 3 bits are PCP (priority), next bit is drop-elibile indicator, and last 12 are VLAN id
     uint16_t data_size_or_type ; 
-    char data[MAX_FRAME_DATA_LEN]; //technically, max per frame should be 1482 bytes; 18 byte header and MTU is is 1500
+    union payload
+    {
+        struct source_sink_payload ss_payload;
+        char data[MAX_FRAME_DATA_LEN];
+    };
+    
 };
 
 struct ethernet_frame
@@ -29,7 +42,9 @@ struct ethernet_frame
     char destination_mac[6];
     char source_mac[6];
     uint16_t data_size_or_type ; 
-    char data[MAX_FRAME_DATA_LEN]; //technically, max per frame should be 1482 bytes; 18 byte header and MTU is is 1500
-};
-
+    union payload
+    {
+        struct source_sink_payload ss_payload;
+        char data[MAX_FRAME_DATA_LEN];
+    };
 #endif
