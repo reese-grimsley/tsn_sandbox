@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
     printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
-    print_hex((char*) &eth_frame, 64);
+    print_hex((char*) &eth_frame, 48);
     printf("\n");
     int counter = 0;
     struct timespec now;
@@ -104,7 +104,6 @@ int main(int argc, char* argv[])
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
         memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
-        print_hex((char*) &eth_frame, 64);
 
         eth_frame.payload.ss_payload.frame_id = counter;
 
