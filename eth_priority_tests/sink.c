@@ -280,10 +280,11 @@ void thread_recv_source_data()
         }
 
     }
+    printf("Exiting sink's main loop; release files and resources...\n");
 
-    //TODO: close data csv file
     fclose(log_file);
 
+    printf("Done!\n");
     pthread_exit(NULL);
 }
 
