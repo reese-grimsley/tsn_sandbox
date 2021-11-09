@@ -247,11 +247,10 @@ void thread_recv_source_data()
                 print_hex(frame.payload.data, 40); printf("\n");
                 print_hex((char*)&frame.payload.ss_payload, 40); printf("\n");
 
+                //we get really ugly alignment issues in the received frame, since the transmitted frame's structure included a VLAN header (4 bytes) that gets stripped at the ethernet interface
+                size_t offset = sizeof(frame.destination_mac) + sizeof(frame.source_mac) + sizeof(frame.data_size_or_type);
                 memcpy(&payload, ((char*)&frame) + 20, sizeof(payload));
                 print_hex((char*)&payload, 40); printf("\n");
-
-
-                printf("alignment diff from frame start to frame data: %d\n", ((int)&(frame.payload)) - ((int)&frame));
 
                 memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));
 

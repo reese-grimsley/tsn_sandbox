@@ -112,7 +112,6 @@ int main(int argc, char* argv[])
 
         eth_frame.payload.ss_payload.frame_id = counter;
         print_hex(eth_frame.payload.data, 40); printf("\n");
-        printf("alignment diff from frame start to frame data: %d\n", ((int)&(eth_frame.payload)) - ((int)&eth_frame));
 
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
