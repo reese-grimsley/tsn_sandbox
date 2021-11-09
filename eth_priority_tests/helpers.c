@@ -234,12 +234,26 @@ void print_hex(const char* str, int len)
     
 }
 
-int open_latency_csv(char* filename, int filelen)
+/**
+ *  int32_t test_id;
+    int32_t frame_id;
+    int32_t frame_priority;
+    struct timespec tx_time;
+ */ 
+int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, int32_t test_id, int32_t priority)
 {
-    return 0;
-}
+    char str_to_write[256];
+    int bytes_written, elements_written;
+    bytes_written = snprintf("%d, %d, %d %ld.%09ld\n", 256, test_id, priority, frame_id, ts.tv_sec, ts.tv_nsec);
+    if (bytes_written < 0)
+    {
+        return -EINVAL;
+    }
+    elements_written = fwrite(str_to_write, 1, bytes_written, f);
+    if (elements_written != 1)
+    {
+        printf("Error in writing to file\n");
+    }
 
-int write_timespec_to_csv(int csv_fd, const struct timespec ts)
-{
     return 0;
 }

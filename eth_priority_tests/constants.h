@@ -30,3 +30,6 @@
 #define MSRP_ETYPE 0x22EA // close to ETH_TSN (0x22f0)
 #define MMRP_ETYPE 0x88F6
 #define ETH_P_VLAN ETH_P_8021Q // or ETH_P_8021AD?
+
+
+#define LATENCY_SAMPLES_TO_LOG 1000

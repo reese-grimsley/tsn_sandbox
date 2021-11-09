@@ -33,7 +33,7 @@
 #include "types.h"
 
 
-struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 750000000};
+struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 100000000};
 
 
 int main(int argc, char* argv[])

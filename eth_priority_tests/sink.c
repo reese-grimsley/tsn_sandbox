@@ -89,14 +89,14 @@ void thread_recv_jammer_with_timestamping()
     {
         // recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
         recvmsg(rcv_jam_sock, &msg, 0);
-        printf("recv pkt [%d]\n", count);
+        // printf("recv pkt [%d]\n", count);
 
 
         int level, type;
         struct timespec ts;
         if (get_hw_timestamp_from_msg(&msg, &ts))
         {
-            printf("TIMESTAMP %ld.%09ld\n", (long)ts.tv_sec, (long)ts.tv_nsec);
+            // printf("TIMESTAMP %ld.%09ld\n", (long)ts.tv_sec, (long)ts.tv_nsec);
 
         }
         count++;
@@ -215,12 +215,14 @@ void thread_recv_source_data()
     printf("\n");
     fflush(stdout);
 
+    int tsn_msgs_received = 0, last_frame_id = -1;
+    FILE* log_file = fopen("source_sink_latency.log", "a");
     //TODO: open data csv file
-    while(1) // TODO: while some volatile value set by SIG handler false... 
+    while(tsn_msgs_received < LATENCY_SAMPLES_TO_LOG) 
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
-        clock_gettime(CLOCK_REALTIME, &now);
+        // clock_gettime(CLOCK_REALTIME, &now);
         if (msg_size == -1 || (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == 0x0008) //also ignore IP
         {
             // printf("recvmsg signalled error: [%d]\n", errno);
@@ -234,14 +236,23 @@ void thread_recv_source_data()
 
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
+                struct ethernet_frame frame;
+                int32_t frame_id, priority, test_id;
+                tsn_msgs_received++;
                 //this is a frame we want.
                 printf("TSN frame!\n");
-                struct ethernet_frame frame;
                 // print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
                 memcpy(&time_from_source, frame.payload.ss_payload.tx_time, sizeof(struct timespec));
+
+                frame_id = frame.payload.ss_payload.frame_id;
+                priority = frame.payload.ss_payload.priority;
+                test_id = frame.payload.ss_payload.test_id;
+
                 if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
                 {
+
+
                     memset(&t_prop, 0, sizeof(t_prop));
                     time_diff(&time_from_source, &time_from_nic, &t_prop);
                     t_prop.tv_sec -= MAX(get_num_leapseconds(), LEAP_SECONDS_OFFSET);
@@ -249,11 +260,19 @@ void thread_recv_source_data()
                     print_timespec(t_prop);
                     printf("\n-----\n");
 
-                    //TODO: add statistics and/or file-write
+                    if (last_frame_id != -1 && last_frame_id > frame_id)
+                    {
+                        fclose(log_file);
+                        break;
+                    }
 
+                    //TODO: add statistics and/or file-write
+                    write_timespec_to_csv(log_file, t_prop, frame_id, test_id, priority);
 
                     //break if counter from frame < current one held here.       
                 }
+                last_frame_id = frame_id;
+                if (tsn_msgs_received % 50 == 0) fflush(log_file);
 
             }
 
@@ -263,7 +282,7 @@ void thread_recv_source_data()
     }
 
     //TODO: close data csv file
-
+    fclose(log_file);
 
     pthread_exit(NULL);
 }
