@@ -43,7 +43,7 @@ int wait(struct timespec sleep_duration, int no_print);
 
 void print_hex(const char* msg, int len);
 
-int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, int32_t test_id, int32_t priority)
+int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, int32_t test_id, int32_t priority);
 
 
 #endif

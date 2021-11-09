@@ -243,10 +243,10 @@ void thread_recv_source_data()
                 printf("TSN frame!\n");
                 // print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
-                memcpy(&time_from_source, frame.payload.ss_payload.tx_time, sizeof(struct timespec));
+                memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));
 
                 frame_id = frame.payload.ss_payload.frame_id;
-                priority = frame.payload.ss_payload.priority;
+                priority = frame.payload.ss_payload.frame_priority;
                 test_id = frame.payload.ss_payload.test_id;
 
                 if (get_hw_timestamp_from_msg(&msg, &time_from_nic))

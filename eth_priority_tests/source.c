@@ -26,7 +26,6 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <errno.h>
-#include <random.h>
 
 #include "constants.h"
 #include "helpers.h"
@@ -89,13 +88,13 @@ int main(int argc, char* argv[])
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
-    memset(&(eth_frame.payload+sizeof(struct source_sink_payload)), 'q', sizeof(eth_frame.payload) - sizeof(struct source_sink_payload));
+    memset(((char*)&(eth_frame.payload.data))+sizeof(struct source_sink_payload), 'q', sizeof(eth_frame.payload) - sizeof(struct source_sink_payload));
     eth_frame.payload.ss_payload.test_id = test_id;
     eth_frame.payload.ss_payload.frame_priority = priority;
 
-    printf("Start source side of source-sink connection\n");
+    printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
-    print_hex((char*) &eth_frame, 32);
+    print_hex((char*) &eth_frame, 48);
     printf("\n");
     int counter = 0;
     struct timespec now;
@@ -105,6 +104,7 @@ int main(int argc, char* argv[])
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
         memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
+
         eth_frame.payload.ss_payload.frame_id = counter;
 
 
