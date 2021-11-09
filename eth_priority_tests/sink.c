@@ -245,6 +245,8 @@ void thread_recv_source_data()
                 print_hex((char*) &frame, 40); printf("\n");
                 print_hex(frame.payload.data, 40); printf("\n");
                 printf("silly thing: %d\n", frame.silly_frame_alignment);
+                printf("align buf : %d\n", frame.align_buffer);
+
                 memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));
 
                 frame_id = frame.payload.ss_payload.frame_id;
