@@ -104,6 +104,8 @@ int main(int argc, char* argv[])
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
         memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
+        print_hex((char*) &eth_frame, 64);
+
         eth_frame.payload.ss_payload.frame_id = counter;
 
 
