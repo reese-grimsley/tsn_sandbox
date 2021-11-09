@@ -47,4 +47,12 @@ struct ethernet_frame
     union eth_payload payload;
 };
 
+struct ethernet_RX_frame
+{
+    char destination_mac[6];
+    char source_mac[6];
+    uint16_t data_size_or_type ; 
+    union eth_payload payload;
+};
+
 #endif

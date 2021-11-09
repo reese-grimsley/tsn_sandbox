@@ -236,13 +236,13 @@ void thread_recv_source_data()
 
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
-                struct ethernet_frame frame;
+                struct ethernet_RX_frame frame;
                 int32_t frame_id, priority, test_id;
                 tsn_msgs_received++;
                 //this is a frame we want.
                 printf("[%d]th TSN frame!\n", tsn_msgs_received);
-                // print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
+                print_hex(frame.data, 40); printf("\n");
                 memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));
 
                 frame_id = frame.payload.ss_payload.frame_id;
