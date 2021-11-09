@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     eth_frame.payload.ss_payload.test_id = test_id;
     eth_frame.payload.ss_payload.frame_priority = priority;
 
-    printf("Start source side of source-sink connection\n");
+    printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
     print_hex((char*) &eth_frame, 32);
     printf("\n");
