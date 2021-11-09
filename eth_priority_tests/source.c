@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
     printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
-    print_hex((char*) &eth_frame, 32);
+    print_hex((char*) &eth_frame, 64);
     printf("\n");
     int counter = 0;
     struct timespec now;
