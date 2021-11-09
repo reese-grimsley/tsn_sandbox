@@ -58,6 +58,8 @@ struct ethernet_RX_frame
     uint16_t data_size_or_type ; 
     uint16_t align_buffer;
     union eth_payload payload;
+    uint16_t align_buffer2;
+
 };
 
 #endif
