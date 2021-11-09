@@ -236,28 +236,30 @@ void thread_recv_source_data()
 
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
-                struct ethernet_RX_frame frame;
+                struct ethernet_RX_frame* frame;
                 union eth_payload payload;
                 int32_t frame_id, priority, test_id;
                 tsn_msgs_received++;
                 //this is a frame we want.
                 printf("[%d]th TSN frame!\n", tsn_msgs_received);
-                memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
-                print_hex((char*) &frame, 40); printf("\n");
-                print_hex(frame.payload.data, 40); printf("\n");
-                print_hex((char*)&frame.payload.ss_payload, 40); printf("\n");
+                frame = (struct ethernet_RX_frame*) msg.msg_iov->iov_base;
+                // memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
+                // print_hex((char*) frame, 40); printf("\n");
+                // print_hex(frame->payload.data, 40); printf("\n");
+                // print_hex((char*)&frame->payload.ss_payload, 40); printf("\n");
 
-                memcpy(&payload, ((char*)&frame) + 20, sizeof(payload));
-                print_hex((char*)&payload, 40); printf("\n");
+                //we get really ugly alignment issues in the received frame, since the transmitted frame's structure included a VLAN header (4 bytes) that gets stripped at the ethernet interface
+                size_t offset = sizeof(frame->destination_mac) + sizeof(frame->source_mac) + \
+                    sizeof(frame->data_size_or_type) + sizeof(frame->padding);
+                // printf("%d offset\n", offset);
+                memcpy(&payload, ((char*)frame) + offset, sizeof(payload));
+                // print_hex((char*)&payload, 40); printf("\n");
 
+                memcpy(&time_from_source, &(payload.ss_payload.tx_time), sizeof(struct timespec));
 
-                printf("alignment diff from frame start to frame data: %d\n", ((int)&(frame.payload)) - ((int)&frame));
-
-                memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));
-
-                frame_id = frame.payload.ss_payload.frame_id;
-                priority = frame.payload.ss_payload.frame_priority;
-                test_id = frame.payload.ss_payload.test_id;
+                frame_id = payload.ss_payload.frame_id;
+                priority = payload.ss_payload.frame_priority;
+                test_id = payload.ss_payload.test_id;
 
                 if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
                 {

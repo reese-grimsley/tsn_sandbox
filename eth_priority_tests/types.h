@@ -46,6 +46,8 @@ struct ethernet_frame
     char destination_mac[ETHER_ADDR_LEN];
     char source_mac[ETHER_ADDR_LEN];
     uint16_t data_size_or_type ; 
+    uint16_t alignment_a;
+
     union eth_payload payload;
 };
 
@@ -54,6 +56,7 @@ struct ethernet_RX_frame
     char destination_mac[ETHER_ADDR_LEN];
     char source_mac[ETHER_ADDR_LEN];
     uint16_t data_size_or_type ; 
+    char padding[6]; //ugly fix. Depends on the compiler/host. NUC host aligns to 64bit word, which mucks with the discarded VLAN header. Have to play nasty tricks to make the payload come out correctly
     union eth_payload payload;
 
 };
