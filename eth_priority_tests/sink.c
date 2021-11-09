@@ -250,6 +250,7 @@ void thread_recv_source_data()
 
                 //we get really ugly alignment issues in the received frame, since the transmitted frame's structure included a VLAN header (4 bytes) that gets stripped at the ethernet interface
                 size_t offset = sizeof(frame->destination_mac) + sizeof(frame->source_mac) + sizeof(frame->data_size_or_type);
+                printf("%d offset\n", offset)
                 memcpy(&payload, ((char*)frame) + offset, sizeof(payload));
                 print_hex((char*)&payload, 40); printf("\n");
 
