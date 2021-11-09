@@ -224,7 +224,7 @@ void print_hex(const char* str, int len)
     int bytes_left = len;
     printf("%d hex bytes: \n", len);
     printf("\t0x ");
-    while (bytes_left-- > 0)
+    while (bytes_left > 0)
     {
         printf("%d\n", bytes_left);
         printf("%02x  ", (uint8_t) str[len - bytes_left]);
@@ -232,6 +232,7 @@ void print_hex(const char* str, int len)
         {
             printf("\n\t0x ");
         }
+        bytes_left--;
     }
     
 }
