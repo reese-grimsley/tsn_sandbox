@@ -229,7 +229,7 @@ void thread_recv_source_data()
         }
         else
         {
-            printf("Received message of length [%d]\n", msg_size);
+            // printf("Received message of length [%d]\n", msg_size);
             
             //if this came within a 802.1Q frame, the offsets will need to change to account for ethernet addresses
             // printf("receive message with protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
@@ -289,7 +289,6 @@ void thread_recv_source_data()
             }
 
             fflush(stdout);
-            break;
         }
 
     }
