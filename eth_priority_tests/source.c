@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <arpa/inet.h>
 #include <net/ethernet.h>
 #include <net/if.h>
@@ -39,7 +40,9 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int8_t priority = 5;
+    int8_t priority = 0;
+
+    srand ( time(NULL) );
     int32_t test_id = random();
 
     int send_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));

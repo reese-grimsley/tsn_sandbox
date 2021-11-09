@@ -229,10 +229,10 @@ void thread_recv_source_data()
         }
         else
         {
-            printf("Received message of length [%d]\n", msg_size);
+            // printf("Received message of length [%d]\n", msg_size);
             
             //if this came within a 802.1Q frame, the offsets will need to change to account for ethernet addresses
-            printf("receive message with protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
+            // printf("receive message with protocol: %04x\n",((struct sockaddr_ll*) msg.msg_name)->sll_protocol);//can filter based on this as well..
 
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
@@ -240,7 +240,7 @@ void thread_recv_source_data()
                 int32_t frame_id, priority, test_id;
                 tsn_msgs_received++;
                 //this is a frame we want.
-                printf("TSN frame!\n");
+                printf("[%d]th TSN frame!\n", tsn_msgs_received);
                 // print_hex(frame.data, sizeof(struct timespec)); printf("\n");
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
                 memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));

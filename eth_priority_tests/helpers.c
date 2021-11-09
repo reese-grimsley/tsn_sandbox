@@ -252,7 +252,7 @@ int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, i
     elements_written = fwrite(str_to_write, 1, bytes_written, f);
     if (elements_written != 1)
     {
-        printf("Error in writing to file\n");
+        printf("Error in writing to file: [%d]\n", elements_written);
     }
 
     return 0;
