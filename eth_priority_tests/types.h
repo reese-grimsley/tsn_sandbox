@@ -45,5 +45,6 @@ struct ethernet_frame
     char source_mac[6];
     uint16_t data_size_or_type ; 
     union eth_payload payload;
+};
 
 #endif
