@@ -242,7 +242,7 @@ void thread_recv_source_data()
                 //this is a frame we want.
                 printf("[%d]th TSN frame!\n", tsn_msgs_received);
                 memcpy(&frame, msg.msg_iov->iov_base, min(sizeof(frame), msg.msg_iov->iov_len));
-                print_hex(frame.data, 40); printf("\n");
+                print_hex(frame.payload.data, 40); printf("\n");
                 memcpy(&time_from_source, &(frame.payload.ss_payload.tx_time), sizeof(struct timespec));
 
                 frame_id = frame.payload.ss_payload.frame_id;
