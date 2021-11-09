@@ -129,6 +129,7 @@ int main(int argc, char* argv[])
         wait(WAIT_DURATION, no_print);
         fflush(stdout);
         counter++;
+        break;
     }
 
 
