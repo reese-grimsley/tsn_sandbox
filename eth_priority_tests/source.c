@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
-    memset((&(eth_frame.payload.data))+sizeof(struct source_sink_payload), 'q', sizeof(eth_frame.payload) - sizeof(struct source_sink_payload));
+    memset(((char*)&(eth_frame.payload.data))+sizeof(struct source_sink_payload), 'q', sizeof(eth_frame.payload) - sizeof(struct source_sink_payload));
     eth_frame.payload.ss_payload.test_id = test_id;
     eth_frame.payload.ss_payload.frame_priority = priority;
 
