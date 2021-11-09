@@ -82,9 +82,10 @@ int main(int argc, char* argv[])
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
     struct ethernet_frame_8021Q eth_frame;
-    eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
+    // eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
     // struct ethernet_frame eth_frame;
     memset(&eth_frame, 0, sizeof(eth_frame));
+    eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
 
 
     //recall communications typically use little-endian
@@ -98,7 +99,7 @@ int main(int argc, char* argv[])
 
     printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
-    print_hex((char*) &eth_frame, 48);
+    print_hex((char*) &eth_frame, 40);
     printf("\n");
     int counter = 0;
     struct timespec now;
@@ -110,6 +111,8 @@ int main(int argc, char* argv[])
         memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
 
         eth_frame.payload.ss_payload.frame_id = counter;
+        print_hex(eth_frame.payload.data, 40); printf("\n");
+        printf("alignment diff from frame start to frame data: %d\n", ((int)&(eth_frame.payload)) - ((int)&eth_frame));
 
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
@@ -128,6 +131,7 @@ int main(int argc, char* argv[])
         wait(WAIT_DURATION, no_print);
         fflush(stdout);
         counter++;
+        break;
     }
 
 
