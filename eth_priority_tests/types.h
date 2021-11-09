@@ -36,7 +36,6 @@ struct ethernet_frame_8021Q
     // tag_control_t TCI; // highest 3 bits are PCP (priority), next bit is drop-elibile indicator, and last 12 are VLAN id
     uint16_t data_size_or_type ; 
     uint16_t align_buffer;
-    uint32_t silly_frame_alignment;
     union eth_payload payload;
     
 };
@@ -56,6 +55,7 @@ struct ethernet_RX_frame
     char source_mac[ETHER_ADDR_LEN];
     uint16_t data_size_or_type ; 
     uint16_t align_buffer;
+    uint32_t silly_frame_alignment;
     union eth_payload payload;
 };
 
