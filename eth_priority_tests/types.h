@@ -29,11 +29,11 @@ struct ethernet_frame_8021Q
     } TCI;
     // tag_control_t TCI; // highest 3 bits are PCP (priority), next bit is drop-elibile indicator, and last 12 are VLAN id
     uint16_t data_size_or_type ; 
-    // union
-    // {
-    //     struct source_sink_payload ss_payload;
-    //     char data[MAX_FRAME_DATA_LEN];
-    // };
+    union
+    {
+        struct source_sink_payload ss_payload;
+        char data[MAX_FRAME_DATA_LEN];
+    };
     
 };
 
@@ -42,9 +42,9 @@ struct ethernet_frame
     char destination_mac[6];
     char source_mac[6];
     uint16_t data_size_or_type ; 
-    // union
-    // {
-    //     struct source_sink_payload ss_payload;
-    //     char data[MAX_FRAME_DATA_LEN];
-    // };
+    union
+    {
+        struct source_sink_payload ss_payload;
+        char data[MAX_FRAME_DATA_LEN];
+    };
 #endif
