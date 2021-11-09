@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 
     printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
-    print_hex((char*) &eth_frame, 48);
+    print_hex((char*) &eth_frame, 40);
     printf("\n");
     int counter = 0;
     struct timespec now;
@@ -111,6 +111,7 @@ int main(int argc, char* argv[])
         memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
 
         eth_frame.payload.ss_payload.frame_id = counter;
+        print_hex(eth_frame.payload.data, 40); printf("\n");
 
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
