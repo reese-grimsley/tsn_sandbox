@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int8_t priority = 2;
+    int8_t priority = 0;
 
     srand ( time(NULL) );
     int32_t test_id = random();
@@ -130,7 +130,6 @@ int main(int argc, char* argv[])
         wait(WAIT_DURATION, no_print);
         fflush(stdout);
         counter++;
-        break;
     }
 
 
