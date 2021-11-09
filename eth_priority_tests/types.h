@@ -55,7 +55,6 @@ struct ethernet_RX_frame
     char source_mac[ETHER_ADDR_LEN];
     uint16_t data_size_or_type ; 
     uint16_t align_buffer;
-    uint32_t silly_frame_alignment;
     union eth_payload payload;
 };
 
