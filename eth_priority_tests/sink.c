@@ -237,6 +237,7 @@ void thread_recv_source_data()
             if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(ETH_P_TSN) )
             {
                 struct ethernet_RX_frame frame;
+                union eth_payload payload;
                 int32_t frame_id, priority, test_id;
                 tsn_msgs_received++;
                 //this is a frame we want.
@@ -245,6 +246,10 @@ void thread_recv_source_data()
                 print_hex((char*) &frame, 40); printf("\n");
                 print_hex(frame.payload.data, 40); printf("\n");
                 print_hex((char*)&frame.payload.ss_payload, 40); printf("\n");
+
+                memcpy(&payload, ((char*)&frame) + 20, sizeof(payload));
+                print_hex((char*)&payload, 40); printf("\n");
+
 
                 printf("alignment diff from frame start to frame data: %d\n", ((int)&(frame.payload)) - ((int)&frame));
 
