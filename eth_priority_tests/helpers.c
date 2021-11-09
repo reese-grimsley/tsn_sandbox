@@ -228,11 +228,12 @@ void print_hex(const char* str, int len)
     {
         // printf("%d\n", bytes_left);
         printf("%02x  ", (uint8_t) str[len - bytes_left]);
+        bytes_left--;
+
         if ((len-bytes_left) % 20 == 0)
         {
             printf("\n\t0x ");
         }
-        bytes_left--;
     }
     
 }
