@@ -81,9 +81,9 @@ int main(int argc, char* argv[])
 
     //setup packets and send over ethernet
     // struct ether_tsn tsn_ethernet;
-    struct ethernet_frame_8021Q eth_frame;
-    eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
-    // struct ethernet_frame eth_frame;
+    // struct ethernet_frame_8021Q eth_frame;
+    // eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
+    struct ethernet_frame eth_frame;
     memset(&eth_frame, 0, sizeof(eth_frame));
 
 
