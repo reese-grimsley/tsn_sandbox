@@ -250,9 +250,9 @@ int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, i
         return -EINVAL;
     }
     elements_written = fwrite(str_to_write, 1, bytes_written, f);
-    if (elements_written != 1)
+    if (elements_written != bytes_written)
     {
-        printf("Error in writing to file: [%d]\n", elements_written);
+        printf("Error in writing to file: [%d] el, [%d] bytes\n", elements_written, bytes_written);
     }
 
     return 0;
