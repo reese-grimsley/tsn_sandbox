@@ -222,11 +222,11 @@ int wait_until(struct timespec wake_time, int no_print)
 void print_hex(const char* str, int len)
 {
     int bytes_left = len;
-    printf("%d hex bytes: \n", len)
+    printf("%d hex bytes: \n", len);
     printf("\t0x ");
     while (bytes_left-- > 0)
     {
-        printf("%d\n", bytes_left)
+        printf("%d\n", bytes_left);
         printf("%02x  ", (uint8_t) str[len - bytes_left]);
         if ((len-bytes_left) % 20 == 0)
         {
