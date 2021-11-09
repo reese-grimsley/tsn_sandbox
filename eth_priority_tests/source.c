@@ -89,9 +89,9 @@ int main(int argc, char* argv[])
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
 
     eth_frame.data_size_or_type = htons(ETH_P_TSN);
-    memset(&(eth_frame.data+sizeof(struct source_sink_payload)), 'q', sizeof(eth_frame.data) - sizeof(struct source_sink_payload));
-    eth_frame.ss_payload.test_id = test_id;
-    eth_frame.ss_payload.frame_priority = priority;
+    memset(&(eth_frame.data+sizeof(struct source_sink_payload)), 'q', sizeof(eth_frame.payload) - sizeof(struct source_sink_payload));
+    eth_frame.payload.ss_payload.test_id = test_id;
+    eth_frame.payload.ss_payload.frame_priority = priority;
 
     printf("Start source side of source-sink connection\n");
 
@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
     {
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
-        memcpy(&eth_frame.ss_payload.tx_time, (void*) &now, sizeof(now));
-        eth_frame.ss_payload.frame_id = counter;
+        memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
+        eth_frame.payload.ss_payload.frame_id = counter;
 
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
