@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 
     //configure the socket
     int rt; 
-    int8_t priority = 0, prio_from_sock;
+    int priority, prio_from_sock;
     int len_size = sizeof(prio_from_sock);
 
     srand ( time(NULL) );
@@ -53,6 +53,8 @@ int main(int argc, char* argv[])
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
     }   
+
+    priority = 3;
     rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
     if (rt != 0)
     {
