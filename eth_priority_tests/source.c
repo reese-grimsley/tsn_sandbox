@@ -40,7 +40,9 @@ int main(int argc, char* argv[])
 {
 
     //configure the socket
-    int8_t priority = 0;
+    int rt; 
+    int8_t priority = 0, prio_from_sock;
+    int len_size = sizeof(prio_from_sock);
 
     srand ( time(NULL) );
     int32_t test_id = random();
@@ -51,7 +53,20 @@ int main(int argc, char* argv[])
         printf("Send socket returned err: [%d]\n", errno);
         exit(errno);
     }   
-    setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+    rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+    if (rt != 0)
+    {
+        printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
+    }
+
+    rt = getsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
+            if (rt != 0)
+    {
+        printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
+    } else
+    {
+        printf("Socket supposedly has priority [%d]\n", prio_from_sock);
+    }
 
     struct sockaddr_ll addr;
     struct ifreq ifr;
