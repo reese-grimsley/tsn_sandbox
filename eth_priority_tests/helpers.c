@@ -248,7 +248,7 @@ int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, i
 {
     char str_to_write[256];
     int bytes_written, elements_written;
-    bytes_written = snprintf(str_to_write, 256, "%d, %d, %d %ld.%09ld\n", test_id, priority, frame_id, ts.tv_sec, ts.tv_nsec);
+    bytes_written = snprintf(str_to_write, 256, "%d, %d, %d, %ld.%09ld\n", test_id, priority, frame_id, ts.tv_sec, ts.tv_nsec);
     if (bytes_written < 0)
     {
         return -EINVAL;
