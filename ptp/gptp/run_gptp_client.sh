@@ -13,5 +13,6 @@ echo "ptp4l is running in bg as pid $!"
 sleep 2
 
 echo "Start phc2sys..."
-sudo phc2sys -s enp87s0 -c CLOCK_REALTIME -w -m -O -37 &> phc2sys.log &  # assume as client configuration... but what if this device is grand-master?
+ # assume as client configuration for -s and -c and -O
+sudo phc2sys -s enp87s0 -c CLOCK_REALTIME  -m -O -37 &> phc2sys.log & 
 echo "phc2sys (sync NIC clock to sys clock) is running in bg as pid $!"
