@@ -1,6 +1,19 @@
+/***
+ * Author: Reese Grimsley
+ * Date Created: 10/25/21
+ * 
+ * Helper functions for source, sink, and jammer code for testing ethernet priority
+ *  levels on a VLAN. Each device connects through managed L2 switch.
+ * 
+ * No guarantees for this software. Use as is at your own risk. This is created as a learning exercise.
+ */
+
 #include "helpers.h"
 
-// doesn't appear to work; returns 0. To really be accurate, probably needs a connection to an NTP server of similar, which an NTP client like chrony will update according (i.e., tai_offset will be updated)
+/**
+ * Attempt to retrieve the leap-second offset by reading the real clock (assumed to be UTC) and the TAI clock, which PTP/NICs use by default
+ *  doesn't appear to work; returns 0. To really be accurate, probably needs a connection to an NTP server of similar, which an NTP client like ntpd (or chrony) will update according (i.e., tai_offset will be updated)
+ */ 
 int get_num_leapseconds(void)
 {
     struct timespec utc, tai, diff;
@@ -17,12 +30,14 @@ int get_num_leapseconds(void)
     return offset;
 }
 
+/**
+ * Configure a socket to use hardware timestamping at the socket (setsockopt) and hardware level (ioctl)
+ */ 
 int configure_hw_timestamping(int sock_fd)
 {
     int flags;
     struct hwtstamp_config hwts_config;
     struct ifreq ifr;
-
 
     flags   = SOF_TIMESTAMPING_RX_SOFTWARE
             | SOF_TIMESTAMPING_TX_SOFTWARE
@@ -84,12 +99,16 @@ int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts)
 
 }
 
+/**
+ * Retrieve the interface index, which is necessary bind a socket to a particular interface
+ * 
+ * returns a negative number if there is an error, otherwise return the index number
+ *  if successful, the index number is also stored within the provided ifreq struct
+ */ 
 int get_eth_index_num(struct ifreq* ifr)
 {
     char* if_name = IF_NAME;
-    size_t if_name_len = sizeof(IF_NAME);
-    // char* if_name = ETH_INTERFACE_I225_VLAN3;
-    // size_t if_name_len = sizeof(ETH_INTERFACE_I225_VLAN3);
+    size_t if_name_len = sizeof(IF_NAME); //specified within constants.h
 
     if (if_name_len < sizeof(ifr->ifr_name) ) 
     {
@@ -102,13 +121,14 @@ int get_eth_index_num(struct ifreq* ifr)
         return -1;
     }
 
-    int fd=socket(AF_UNIX,SOCK_DGRAM,0);
+    //quick test socket, just to get the index from an ioctl
+    int fd=socket(AF_UNIX, SOCK_DGRAM, 0);
     if (fd==-1) {
         printf("%s",strerror(errno));
         return -abs(errno);
     }
 
-    if (ioctl(fd,SIOCGIFINDEX,ifr)==-1) 
+    if (ioctl(fd, SIOCGIFINDEX, ifr)==-1) 
     {
         printf("%s",strerror(errno));
         return -abs(errno);
@@ -117,6 +137,14 @@ int get_eth_index_num(struct ifreq* ifr)
     return ifr->ifr_ifindex;
 }
 
+/**
+ * Retrieve the MAC address tied to a particular interface
+ * 
+ * Returns=1 if there was an issue; otherwise returns 0
+ * 
+ * If successful, the MAC will be stored in ifr->ifr_hwaddr.sa_data
+ * 
+ */  
 int get_eth_mac_addr(struct ifreq* ifr)
 {
     int rc;
@@ -141,8 +169,12 @@ int get_eth_mac_addr(struct ifreq* ifr)
         shutdown(fd, 2);
         return -1;
     }
+    return 0;
 }
 
+/**
+ * Print a timespec. Convenience function. No newline
+ */ 
 void print_timespec(const struct timespec ts)
 {
     printf("T=%ld.%09ld", ts.tv_sec, ts.tv_nsec);
@@ -154,27 +186,6 @@ void print_timespec(const struct timespec ts)
  */ 
 void time_diff(const struct timespec * older_time, const struct timespec * newer_time, struct timespec* diff)
 {
-    //  struct timespec diff;
-    //  diff.tv_sec = newer_time->tv_sec - older_time->tv_sec;
-    //  diff.tv_nsec = newer_time->tv_nsec - older_time->tv_nsec;
-
-    //  if (diff.tv_nsec < 0 && diff.tv_sec == 0)
-    //  {
-    //       diff.tv_nsec = abs(diff.tv_nsec);
-    //  }
-
-    //  while (diff.tv_nsec < 0)
-    //  {
-    //       diff.tv_nsec += 1000 * 1000 * 1000;
-    //       diff.tv_sec--;
-    //  }
-    //  while (diff.tv_nsec > 1000 * 1000 * 1000)
-    //  {
-    //       diff.tv_nsec -= 1000 * 1000 * 1000;
-    //       diff.tv_sec++;
-    //  }
-
-    //  return diff;
     if ((newer_time->tv_nsec - older_time->tv_nsec)<0)
     {
         diff->tv_sec = newer_time->tv_sec - older_time->tv_sec-1;
@@ -187,7 +198,10 @@ void time_diff(const struct timespec * older_time, const struct timespec * newer
     }
 }
 
-
+/**
+ * Wait some duration of time. Returns a negative value if we cannot sleep (for instance, a negative sleep duration)
+ * 
+ */ 
 int wait(struct timespec sleep_duration, int no_print)
 {
     struct timespec remaining_time;
@@ -208,6 +222,9 @@ int wait(struct timespec sleep_duration, int no_print)
     return return_code;
 }
 
+/**
+ * Wait until the clock reads a particular time
+ */ 
 int wait_until(struct timespec wake_time, int no_print)
 {
     struct timespec current_time, sleep_duration;
@@ -218,7 +235,9 @@ int wait_until(struct timespec wake_time, int no_print)
     return wait(sleep_duration, no_print);
 }
 
-
+/**
+ * Print something as a hex string
+ */ 
 void print_hex(const char* str, int len)
 {
     int bytes_left = len;
@@ -226,37 +245,34 @@ void print_hex(const char* str, int len)
     printf("\t0x ");
     while (bytes_left > 0)
     {
-        // printf("%d\n", bytes_left);
-        printf("%02x  ", (uint8_t) str[len - bytes_left]);
+        //add a space every other byte
+        printf("%02x%s", (uint8_t) str[len - bytes_left], (len - bytes_left) % 2 == 1 ? " " : "");
         bytes_left--;
 
-        if ((len-bytes_left) % 20 == 0)
+        if ((len-bytes_left) % 16 == 0)
         {
-            printf("\n\t0x ");
+            printf("\n\t0x\t");
         }
     }
     
 }
 
 /**
- *  int32_t test_id;
-    int32_t frame_id;
-    int32_t frame_priority;
-    struct timespec tx_time;
+ *  Write latency-logging data to file
  */ 
-int write_timespec_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, int32_t test_id, int32_t priority)
+int write_frame_time_to_csv(FILE* f, const struct timespec ts, int32_t frame_id, int32_t test_id, int32_t priority)
 {
     char str_to_write[256];
-    int bytes_written, elements_written;
-    bytes_written = snprintf(str_to_write, 256, "%d, %d, %d, %ld.%09ld\n", test_id, priority, frame_id, ts.tv_sec, ts.tv_nsec);
-    if (bytes_written < 0)
+    int bytes_formatted, bytes_written;
+    bytes_formatted = snprintf(str_to_write, 256, "%d, %d, %d, %ld.%09ld\n", test_id, priority, frame_id, ts.tv_sec, ts.tv_nsec);
+    if (bytes_formatted < 0)
     {
         return -EINVAL;
     }
-    elements_written = fwrite(str_to_write, 1, bytes_written, f);
-    if (elements_written != bytes_written)
+    bytes_written = fwrite(str_to_write, 1, bytes_formatted, f);
+    if (bytes_written != bytes_formatted)
     {
-        printf("Error in writing to file: [%d] el, [%d] bytes\n", elements_written, bytes_written);
+        printf("Error in writing to file: [%d] el, [%d] bytes\n", bytes_written, bytes_formatted);
     }
 
     return 0;
