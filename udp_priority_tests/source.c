@@ -45,6 +45,7 @@ int main(int argc, char* argv[])
     int rt; 
     int priority, prio_from_sock;
     int len_size;
+    char if_name[32] = IF_NAME;
 
     priority = default_priority;
 
@@ -87,9 +88,24 @@ int main(int argc, char* argv[])
 
     memset(&addr, 0, sizeof(addr));
 
-    addr.sin_family = AF_INET;
-    addr.port = SINK_PORT;
+    rc = get_eth_index_num(ifr);
+    if (rc == -1)
+    {
+        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+    }
+    printf("Using network interface %d\n", ifr->ifr_ifindex);
 
+    if (setsockopt(send_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
+		perror("SO_BINDTODEVICE");
+		shutdown(send_sock,2);
+		exit(errno);
+	}
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = SINK_PORT;
+    addr.sll_ifindex = ifr->ifr_ifindex;
 
 	if (inet_aton(SINK_IP_ADDR , &addr.sin_addr) == 0) 
 	{
@@ -101,6 +117,7 @@ int main(int argc, char* argv[])
 
     dgram.ss_payload.test_id = test_id;
     dgram.ss_payload.frame_priority = priority;
+    memset(((char*)&(dgram.data))+sizeof(struct source_sink_payload), 'q', sizeof(dgram) - sizeof(struct source_sink_payload));
 
     printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
