@@ -30,10 +30,11 @@
 #include <sys/time.h>
 #include <errno.h>
 
+#include "helpers.h"
 #include "constants.h"
 #include "types.h"
 
-int setup_sock_udp(struct sockaddr_in* sock_addr)
+int setup_sock_udp(struct sockaddr_in* sink_addr)
 {
     int jammer_sock;
     char junk_data[MAX_UDP_PACKET_SIZE];
