@@ -88,14 +88,14 @@ int main(int argc, char* argv[])
 
     memset(&addr, 0, sizeof(addr));
 
-    rc = get_eth_index_num(ifr);
-    if (rc == -1)
+    rt = get_eth_index_num(&ifr);
+    if (rt == -1)
     {
         printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
         shutdown(rcv_src_sock, 2);
         exit(errno);
     }
-    printf("Using network interface %d\n", ifr->ifr_ifindex);
+    printf("Using network interface %d\n", ifr.ifr_ifindex);
 
     if (setsockopt(send_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
 		perror("SO_BINDTODEVICE");
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
     addr.sin_family = AF_INET;
     addr.sin_port = SINK_PORT;
-    addr.sll_ifindex = ifr->ifr_ifindex;
+    // addr.sll_ifindex = ifr.ifr_ifindex;
 
 	if (inet_aton(SINK_IP_ADDR , &addr.sin_addr) == 0) 
 	{
