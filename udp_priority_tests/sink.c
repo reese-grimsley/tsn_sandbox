@@ -83,7 +83,7 @@ void thread_recv_jammer_data()
 
 int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr)
 {
-    int rcv_src_sock, rc;
+    int rcv_src_sock, rt;
     char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
     char if_name[32] = IF_NAME;
 
@@ -95,8 +95,8 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
     }
 
 
-    rc = configure_hw_timestamping(rcv_src_sock);
-    if (rc == -1)
+    rt = configure_hw_timestamping(rcv_src_sock);
+    if (rt == -1)
     {
         printf("Failed to setup; shutdown. errno [%d]", errno);
         shutdown(rcv_src_sock, 2);
@@ -105,7 +105,6 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
 
 
     struct sockaddr_in addr_sink;
-    struct ifreq ifr;
 
     memset(rcv_src_addr, 0, sizeof(*rcv_src_addr));
 
@@ -140,7 +139,7 @@ void thread_recv_source_data()
     int rc;
     char ctrl[4096], data[4096], buf[4096];
     struct cmsghdr *cmsg;
-    struct sockaddr_ll rcv_src_addr;
+    struct sockaddr_in rcv_src_addr;
     struct timespec ts;
     struct msghdr msg;
     struct iovec iov;
@@ -183,13 +182,12 @@ void thread_recv_source_data()
         // if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(frame_type) )
         // {
         union udp_dgram* dgram;
-        union ss_payload payload;
         int32_t frame_id, priority, test_id;
 
         msgs_received++;
 
         //this is a frame we want.
-        dgram = (struct udp_dgram*) msg.msg_iov->iov_base;
+        dgram = (union udp_dgram*) msg.msg_iov->iov_base;
 
         //retrieve data from the payload
         memcpy(&time_from_source, &(dgram->ss_payload.tx_time), sizeof(struct timespec));
