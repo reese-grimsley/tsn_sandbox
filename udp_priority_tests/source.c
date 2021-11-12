@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
     if (argc == 2)
     {
         int prio = atoi(argv[1]);
+        printf("Passed arg %s; intepreted as priority [%d]", argv[1], prio);
         if (prio >= 0 && prio <= 7) priority = prio;
     }
 
