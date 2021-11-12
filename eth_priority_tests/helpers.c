@@ -242,7 +242,7 @@ void print_hex(const char* str, int len)
 {
     int bytes_left = len;
     // printf("%d hex bytes: \n", len);
-    printf("\t0x ");
+    printf("\t0x\t");
     while (bytes_left > 0)
     {
         //add a space every other byte
