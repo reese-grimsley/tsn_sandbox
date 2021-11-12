@@ -67,7 +67,6 @@ int main(int argc, char* argv[])
         exit(errno);
     }   
 
-    priority = 3;
     rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
     if (rt != 0)
     {
