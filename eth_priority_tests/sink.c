@@ -150,54 +150,7 @@ void thread_recv_source_data()
 
     frame_type = ETH_P_TSN;
     int rcv_src_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr);
-    /* remove after successful test. Most complex portion of this program
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
-    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
-    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-    if( rcv_src_sock == -1)
-    {
-        printf("Recv-from-source socket returned err: [%d]\n", errno);
-        exit(errno);    
-    }
-
-    rc = get_eth_index_num(&ifr);
-    if (rc == -1)
-    {
-        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
-    }
-    printf("Using network interface %d\n", ifr.ifr_ifindex);
-
-    rc = configure_hw_timestamping(rcv_src_sock);
-    if (rc == -1)
-    {
-        printf("Failed to setup; shutdown. errno [%d]", errno);
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
-
-    }
-
-    rcv_src_addr.sll_family = AF_PACKET;
-    // rcv_src_addr.sll_protocol = htons(ETH_P_ALL);
-    // rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
-    rcv_src_addr.sll_protocol = htons(ETH_P_TSN);
-    rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
-    rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
-    rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
-
-    char if_name[20] = IF_NAME;
-    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
-		perror("SO_BINDTODEVICE");
-		shutdown(rcv_src_sock,2);
-		exit(errno);
-	}
     
-    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
-    memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
-    memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
-    */
-
     // setup control messages; these are retrieved from the kernel/socket/NIC to get the hardware RX timestampß
     cmsg = (struct cmsghdr *) &ctrl;
     msg.msg_control = (char *) ctrl;

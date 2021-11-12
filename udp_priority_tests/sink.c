@@ -81,27 +81,19 @@ void thread_recv_jammer_data()
     pthread_exit(NULL);
 }
 
-int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_ll *rcv_src_addr)
+int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr)
 {
     int rcv_src_sock, rc;
     char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
     char if_name[32] = IF_NAME;
 
-    rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(frame_type)); //e.g. ETH_P_TSN
+    rcv_src_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); //e.g. ETH_P_TSN
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
         exit(errno);    
     }
 
-    rc = get_eth_index_num(ifr);
-    if (rc == -1)
-    {
-        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
-    }
-    printf("Using network interface %d\n", ifr->ifr_ifindex);
 
     rc = configure_hw_timestamping(rcv_src_sock);
     if (rc == -1)
@@ -111,20 +103,32 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
         exit(errno);
     }
 
-    rcv_src_addr->sll_family = AF_PACKET;
-    rcv_src_addr->sll_protocol = htons(frame_type);
-    rcv_src_addr->sll_ifindex = ifr->ifr_ifindex;
-    rcv_src_addr->sll_halen = ETHER_ADDR_LEN;
-    rcv_src_addr->sll_pkttype = PACKET_OTHERHOST;
 
-    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
-		perror("SO_BINDTODEVICE");
+    struct sockaddr_in addr_sink;
+    struct ifreq ifr;
+
+    memset(rcv_src_addr, 0, sizeof(*rcv_src_addr));
+
+    rcv_src_addr->sin_family = AF_INET;
+    rcv_src_addr->sin_port = htons(SINK_PORT);
+    rcv_src_addr->sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
+
+
+    // addr_sink.sll_ifindex = ifr.ifr_ifindex;
+
+	// if (inet_aton(SINK_IP_ADDR , &addr_sink.sin_addr) == 0) 
+	// {
+	// 	fprintf(stderr, "inet_aton() failed\n");
+	// 	exit(1);
+	// }
+
+    rt = bind(rcv_src_sock, (struct sockaddr*) rcv_src_addr, sizeof(*rcv_src_addr));
+    if (rt != 0)	
+    {
+		perror("bind socket");
 		shutdown(rcv_src_sock,2);
 		exit(errno);
 	}
-
-    memset(&(rcv_src_addr->sll_addr), 0, sizeof(rcv_src_addr->sll_addr));
-    memcpy(&(rcv_src_addr->sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
     return rcv_src_sock;
 }
@@ -142,61 +146,13 @@ void thread_recv_source_data()
     struct iovec iov;
     struct timespec now, start, diff, time_from_source, time_from_nic, t_prop;
     int16_t frame_type;
-    int tsn_msgs_received, last_frame_id;
+    int msgs_received, last_frame_id;
 
     memset(data, 0, 4096);
     iov.iov_base = data;
     iov.iov_len = 4096;
 
-    frame_type = ETH_P_TSN;
     int rcv_src_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr);
-    /* remove after successful test. Most complex portion of this program
-    int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_TSN));
-    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_VLAN));
-    // int rcv_src_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-    if( rcv_src_sock == -1)
-    {
-        printf("Recv-from-source socket returned err: [%d]\n", errno);
-        exit(errno);    
-    }
-
-    rc = get_eth_index_num(&ifr);
-    if (rc == -1)
-    {
-        printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
-    }
-    printf("Using network interface %d\n", ifr.ifr_ifindex);
-
-    rc = configure_hw_timestamping(rcv_src_sock);
-    if (rc == -1)
-    {
-        printf("Failed to setup; shutdown. errno [%d]", errno);
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
-
-    }
-
-    rcv_src_addr.sll_family = AF_PACKET;
-    // rcv_src_addr.sll_protocol = htons(ETH_P_ALL);
-    // rcv_src_addr.sll_protocol = htons(ETH_P_VLAN);
-    rcv_src_addr.sll_protocol = htons(ETH_P_TSN);
-    rcv_src_addr.sll_ifindex = ifr.ifr_ifindex;
-    rcv_src_addr.sll_halen = ETHER_ADDR_LEN;
-    rcv_src_addr.sll_pkttype = PACKET_OTHERHOST;
-
-    char if_name[20] = IF_NAME;
-    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
-		perror("SO_BINDTODEVICE");
-		shutdown(rcv_src_sock,2);
-		exit(errno);
-	}
-    
-    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
-    memset(&(rcv_src_addr.sll_addr), 0, sizeof(rcv_src_addr.sll_addr));
-    memcpy(&(rcv_src_addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
-    */
 
     // setup control messages; these are retrieved from the kernel/socket/NIC to get the hardware RX timestampß
     cmsg = (struct cmsghdr *) &ctrl;
@@ -209,7 +165,7 @@ void thread_recv_source_data()
 
     printf("Start steady state in sink of source-sink connection\n");
 
-    tsn_msgs_received = 0;
+    msgs_received = 0;
     last_frame_id = -1;
     FILE* log_file = fopen("source_sink_latency.csv", "a");
 
@@ -219,57 +175,56 @@ void thread_recv_source_data()
     printf("\n");
     fflush(stdout);
 
-    while(tsn_msgs_received < LATENCY_SAMPLES_TO_LOG) 
+    while(msgs_received < LATENCY_SAMPLES_TO_LOG) 
     {
         int msg_size;
         msg_size = recvmsg(rcv_src_sock, &msg, 0);
 
-        if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(frame_type) )
+        // if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(frame_type) )
+        // {
+        union udp_dgram* dgram;
+        union ss_payload payload;
+        int32_t frame_id, priority, test_id;
+
+        msgs_received++;
+
+        //this is a frame we want.
+        dgram = (struct udp_dgram*) msg.msg_iov->iov_base;
+
+        //retrieve data from the payload
+        memcpy(&time_from_source, &(dgram->ss_payload.tx_time), sizeof(struct timespec));
+        frame_id = dgram->ss_payload.frame_id;
+        priority = dgram->ss_payload.frame_priority;
+        test_id = dgram->ss_payload.test_id;
+
+        printf("[%d]th TSN frame with priority [%d]!\n", msgs_received, priority);
+
+
+        if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
         {
-            struct ethernet_frame* frame;
-            union eth_payload payload;
-            int32_t frame_id, priority, test_id;
+            memset(&t_prop, 0, sizeof(t_prop));
+            time_diff(&time_from_source, &time_from_nic, &t_prop);
+            t_prop.tv_sec -= MAX(get_num_leapseconds(), LEAP_SECONDS_OFFSET);
+            printf("Propagation time (NIC, corrected for UTC): ");
+            print_timespec(t_prop);
+            printf("\n-----\n");
 
-            tsn_msgs_received++;
-
-            //this is a frame we want.
-            frame = (struct ethernet_frame*) msg.msg_iov->iov_base;
-            payload = frame->payload;
-
-            //retrieve data from the payload
-            memcpy(&time_from_source, &(payload.ss_payload.tx_time), sizeof(struct timespec));
-            frame_id = payload.ss_payload.frame_id;
-            priority = payload.ss_payload.frame_priority;
-            test_id = payload.ss_payload.test_id;
-
-            printf("[%d]th TSN frame with priority [%d]!\n", tsn_msgs_received, priority);
-
-
-            if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
+            //keep logs consistent within the same test
+            if (last_frame_id != -1 && last_frame_id > frame_id)
             {
-                memset(&t_prop, 0, sizeof(t_prop));
-                time_diff(&time_from_source, &time_from_nic, &t_prop);
-                t_prop.tv_sec -= MAX(get_num_leapseconds(), LEAP_SECONDS_OFFSET);
-                printf("Propagation time (NIC, corrected for UTC): ");
-                print_timespec(t_prop);
-                printf("\n-----\n");
-
-                //keep logs consistent within the same test
-                if (last_frame_id != -1 && last_frame_id > frame_id)
-                {
-                    fclose(log_file);
-                    break;
-                }
-
-                //add statistics and/or file-write
-                write_frame_time_to_csv(log_file, t_prop, frame_id, test_id, priority);
-
+                fclose(log_file);
+                break;
             }
-            last_frame_id = frame_id;
-            //ensure some data gets written in case of intermittent failure
-            if (tsn_msgs_received % 50 == 0) fflush(log_file);
+
+            //add statistics and/or file-write
+            write_frame_time_to_csv(log_file, t_prop, frame_id, test_id, priority);
 
         }
+        last_frame_id = frame_id;
+        //ensure some data gets written in case of intermittent failure
+        if (msgs_received % 50 == 0) fflush(log_file);
+
+        // }
 
         fflush(stdout);
 
