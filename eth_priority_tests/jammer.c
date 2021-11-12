@@ -37,9 +37,6 @@
 int setup_sock_udp(struct sockaddr_in* sink_addr)
 {
     int jammer_sock;
-    char junk_data[MAX_UDP_PACKET_SIZE];
-
-
     
     jammer_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if( jammer_sock == -1)
