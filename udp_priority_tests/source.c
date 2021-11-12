@@ -83,10 +83,11 @@ int main(int argc, char* argv[])
         printf("Socket said to have priority [%d]\n", prio_from_sock);
     }
 
-    struct sockaddr_in addr;
+    struct sockaddr_in addr_sink, addr_src;
     struct ifreq ifr;
 
-    memset(&addr, 0, sizeof(addr));
+    memset(&addr_sink, 0, sizeof(addr_sink));
+    memset(&addr_src, 0, sizeof(addr_src));
 
     // rt = get_eth_index_num(&ifr);
     // if (rt == -1)
@@ -103,17 +104,29 @@ int main(int argc, char* argv[])
 	// 	exit(errno);
 	// }
 
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(SINK_PORT);
-    addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+    addr_sink.sin_family = AF_INET;
+    addr_sink.sin_port = htons(SINK_PORT);
+    addr_sink.sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
 
-    // addr.sll_ifindex = ifr.ifr_ifindex;
+    addr_src.sin_family = AF_INET;
+    addr_src.sin_port = htons(SINK_PORT);
+    addr_src.sin_addr.s_addr = inet_addr(SOURCE_IP_ADDR_VLAN);
 
-	// if (inet_aton(SINK_IP_ADDR , &addr.sin_addr) == 0) 
+    // addr_sink.sll_ifindex = ifr.ifr_ifindex;
+
+	// if (inet_aton(SINK_IP_ADDR , &addr_sink.sin_addr) == 0) 
 	// {
 	// 	fprintf(stderr, "inet_aton() failed\n");
 	// 	exit(1);
 	// }
+
+    rt = bind(send_sock, (struct sockaddr*) &addr_src, sizeof(addr_src));
+    if (rt != 0)	
+    {
+		perror("bind socket");
+		shutdown(send_sock,2);
+		exit(errno);
+	}
 
     union udp_dgram dgram;
 
@@ -137,7 +150,7 @@ int main(int argc, char* argv[])
         print_hex(dgram.data, 40); printf("\n");
 
 
-        int rc = sendto(send_sock, (void*) &dgram, sizeof(dgram), 0, (struct sockaddr*) &addr, sizeof(addr));
+        int rc = sendto(send_sock, (void*) &dgram, sizeof(dgram), 0, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
