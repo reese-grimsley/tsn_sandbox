@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     }
 
     rt = getsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
-            if (rt != 0)
+    if (rt != 0)
     {
         printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
     } else
