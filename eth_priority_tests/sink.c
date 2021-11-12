@@ -83,7 +83,7 @@ void thread_recv_jammer_data()
 
 int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_ll *rcv_src_addr)
 {
-    int rcv_src_sock;
+    int rcv_src_sock, rc;
     char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
     char if_name[32] = IF_NAME;
 
@@ -135,7 +135,7 @@ void thread_recv_source_data()
     struct ifreq ifr;
     int rc;
     char ctrl[4096], data[4096], buf[4096];
-    struct cmsghdr *cmsg; = (struct cmsghdr *) &ctrl;
+    struct cmsghdr *cmsg;
     struct sockaddr_ll rcv_src_addr;
     struct timespec ts;
     struct msghdr msg;
@@ -242,7 +242,7 @@ void thread_recv_source_data()
             priority = payload.ss_payload.frame_priority;
             test_id = payload.ss_payload.test_id;
 
-            printf("[%d]th TSN frame with priority [%d]!\n", tsn_msgs_received, prioirty);
+            printf("[%d]th TSN frame with priority [%d]!\n", tsn_msgs_received, priority);
 
 
             if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
