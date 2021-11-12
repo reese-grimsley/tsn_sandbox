@@ -19,7 +19,7 @@
 #define MAX_FRAME_DATA_LEN 1360
 #define MAX_UDP_PACKET_SIZE 1360
 
-//37 as of Nov. 5 2021. This will change. Should be updated or read from the system. NICs are sync'd to TAI which is LEAP_SECONDS_FFSET ahead of UTC, which the RTC/CLOCK_REALTIME reads.
+//37 as of Nov. 5 2021. This will change, but not until at least June 30/2022. Should be updated or read from the system. NICs are sync'd to TAI which is LEAP_SECONDS_FFSET ahead of UTC, which the RTC/CLOCK_REALTIME reads.
 #define LEAP_SECONDS_OFFSET 37 
 
 //From openAVNU; does not seem to correspond to any well-known types of ethernet message/protocol.
@@ -28,6 +28,5 @@
 #define MSRP_ETYPE 0x22EA // close to ETH_TSN (0x22f0)
 #define MMRP_ETYPE 0x88F6
 #define ETH_P_VLAN ETH_P_8021Q // or ETH_P_8021AD?
-
 
 #define LATENCY_SAMPLES_TO_LOG 1000

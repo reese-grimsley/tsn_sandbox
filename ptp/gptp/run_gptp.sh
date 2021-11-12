@@ -7,7 +7,7 @@ if [[ `whoami` != "root" ]]; then
 fi
 
 echo "Start ptp..."
-sudo ptp4l -f ptp_client.conf -i enp87s0 -m &> ptp.log &
+sudo ptp4l -f gPTP.cfg -i enp87s0 -m &> ptp.log &
 echo "ptp4l is running in bg as pid $!"
 
 sleep 2
