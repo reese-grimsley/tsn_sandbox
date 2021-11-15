@@ -21,6 +21,7 @@
 #define MAX_FRAME_SIZE 1500
 #define MAX_FRAME_DATA_LEN 1360
 #define MAX_UDP_PACKET_SIZE 1360
+#define MAX_TCP_PACKET_SIZE 100
 
 //37 as of Nov. 5 2021. This will change, but not until at least June 30/2022. Should be updated or read from the system. NICs are sync'd to TAI which is LEAP_SECONDS_FFSET ahead of UTC, which the RTC/CLOCK_REALTIME reads.
 #define LEAP_SECONDS_OFFSET 37 
