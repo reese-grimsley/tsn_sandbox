@@ -94,13 +94,17 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
         exit(errno);    
     }
 
+    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
+    {
+        printf("setsockopt(SO_REUSEADDR) failed", errno);
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+    }
 
     rt = configure_hw_timestamping(rcv_src_sock);
     if (rt == -1)
     {
-        printf("Failed to setup; shutdown. errno [%d]", errno);
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
+
     }
 
 
@@ -151,6 +155,7 @@ void thread_recv_source_data()
     iov.iov_base = data;
     iov.iov_len = 4096;
 
+    printf("Setup sink socket\n");
     int server_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr);
     rc = listen(server_sock, 2);
     if (rc != 0)
