@@ -36,7 +36,7 @@
 #include "types.h"
 
 
-struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 100000000};
+struct timespec WAIT_DURATION = {.tv_sec = 1, .tv_nsec = 00000000};
 
 int default_priority = 3;
 
