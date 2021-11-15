@@ -96,7 +96,7 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
 
     if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
     {
-        printf("setsockopt(SO_REUSEADDR) failed", errno);
+        printf("setsockopt(SO_REUSEADDR) failed");
         shutdown(rcv_src_sock, 2);
         exit(errno);
     }

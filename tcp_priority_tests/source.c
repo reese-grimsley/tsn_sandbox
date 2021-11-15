@@ -85,8 +85,8 @@ int main(int argc, char* argv[])
 
     if (setsockopt(send_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
     {
-        printf("setsockopt(SO_REUSEADDR) failed", errno);
-        shutdown(rcv_src_sock, 2);
+        printf("setsockopt(SO_REUSEADDR) failed");
+        shutdown(send_sock, 2);
         exit(errno);
     }
 
