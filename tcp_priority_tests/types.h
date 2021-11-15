@@ -70,7 +70,7 @@ union udp_dgram
 union tcp_packet
 {
     struct source_sink_payload ss_payload;
-    char data[MAX_UDP_PACKET_SIZE];
+    char data[MAX_TCP_PACKET_SIZE];
 };
 
 #endif

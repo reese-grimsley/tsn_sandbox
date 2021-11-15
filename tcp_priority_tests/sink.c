@@ -202,19 +202,19 @@ void thread_recv_source_data()
 
         // if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(frame_type) )
         // {
-        union udp_dgram* dgram;
+        union tcp_packet* pkt;
         int32_t frame_id, priority, test_id;
 
         msgs_received++;
 
         //this is a frame we want.
-        dgram = (union udp_dgram*) msg.msg_iov->iov_base;
+        pkt = (union tcp_packet*) msg.msg_iov->iov_base;
 
         //retrieve data from the payload
-        memcpy(&time_from_source, &(dgram->ss_payload.tx_time), sizeof(struct timespec));
-        frame_id = dgram->ss_payload.frame_id;
-        priority = dgram->ss_payload.frame_priority;
-        test_id = dgram->ss_payload.test_id;
+        memcpy(&time_from_source, &(pkt->ss_payload.tx_time), sizeof(struct timespec));
+        frame_id = pkt->ss_payload.frame_id;
+        priority = pkt->ss_payload.frame_priority;
+        test_id = pkt->ss_payload.test_id;
 
         printf("[%d]th TSN frame with priority [%d]!\n", msgs_received, priority);
 
