@@ -83,6 +83,13 @@ int main(int argc, char* argv[])
         printf("Socket said to have priority [%d]\n", prio_from_sock);
     }
 
+    if (setsockopt(send_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
+    {
+        printf("setsockopt(SO_REUSEADDR) failed", errno);
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
+    }
+
     struct sockaddr_in addr_sink, addr_src;
     struct ifreq ifr;
 
