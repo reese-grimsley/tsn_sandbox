@@ -34,6 +34,8 @@
 #include "constants.h"
 #include "types.h"
 
+#define USE_UDP 1
+
 int go_slower = 1;
 struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 1000000};
 
@@ -112,27 +114,31 @@ int main(int argc, char* argv[])
 
     printf("Start jammer\n");
     
-    // jammer_sock = setup_sock_udp(&sink_addr);
+#if USE_UDP
+    jammer_sock = setup_sock_udp(&sink_addr);
+    memset(junk_data, '^', MAX_UDP_PACKET_SIZE);
 
+#else
     jammer_sock = setup_sock_eth(&addr, &ifr);
     memset(&(addr.sll_addr), 0, sizeof(addr.sll_addr));
     memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
-
-    // memset(junk_data, '^', MAX_UDP_PACKET_SIZE);
     memset(((char*) &(eth_frame.payload.data)), '^', sizeof(eth_frame.payload));
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
     eth_frame.data_size_or_type = htons(ETH_P_JAMMER);
-
     print_hex((char*)&eth_frame, 48);
+#endif
 
     printf("Send data as fast as possible\n");
 
 
     while(1)
     {
-        // sendto(jammer_sock, junk_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &sink_addr, sizeof(sink_addr));
+#if USE_UDP
+        sendto(jammer_sock, junk_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &sink_addr, sizeof(sink_addr));
+#else
         int rc = sendto(jammer_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
+#endif
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
