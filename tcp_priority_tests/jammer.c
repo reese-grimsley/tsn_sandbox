@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
     char dest_addr[ETHER_ADDR_LEN+1];
     char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
 
-    memcpy(dest_addr, ADDRESS_TO_JAM, sizeof(dest_addr));
+    memcpy(&dest_addr, &ADDRESS_TO_JAM, sizeof(dest_addr));
 
     printf("Start jammer\n");
     
