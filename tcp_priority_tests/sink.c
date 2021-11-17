@@ -168,7 +168,7 @@ void thread_recv_source_data(void *args)
     struct timespec now, start, diff, time_from_source, time_from_nic, t_prop;
     int16_t frame_type;
     int msgs_received, last_frame_id, len;
-    int priority, prio_from_sock, len_size);
+    int priority;
 
     priority = *((int*) args);
 
