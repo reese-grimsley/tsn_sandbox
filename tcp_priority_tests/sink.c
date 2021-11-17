@@ -84,7 +84,7 @@ void thread_recv_jammer_data()
 int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr, int priority)
 {
     int rcv_src_sock, rt;
-    int priority, prio_from_sock, len_size);
+    int prio_from_sock, len_size;
 
     char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
     char if_name[32] = IF_NAME;
@@ -96,14 +96,14 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
         exit(errno);    
     }
 
-    rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+    rt = setsockopt(rcv_src_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
     if (rt != 0)
     {
         printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
     }
 
     len_size = sizeof(prio_from_sock);
-    rt = getsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
+    rt = getsockopt(rcv_src_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
     if (rt != 0)
     {
         printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
@@ -170,7 +170,7 @@ void thread_recv_source_data(void *args)
     int msgs_received, last_frame_id, len;
     int priority, prio_from_sock, len_size);
 
-    priority = (int)*args;
+    priority = *((int*) args);
 
     memset(data, 0, 4096);
     iov.iov_base = data;
