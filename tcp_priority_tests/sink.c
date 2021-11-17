@@ -265,7 +265,8 @@ void thread_recv_source_data(void *args)
         if (msgs_received % 50 == 0) fflush(log_file);
 
         // }
-        sendto(rcv_src_sock, (char*) "ACK", 4, 0, (struct sockaddr*) &src_addr, sizeof(src_addr));
+        char response[32] = "ACKNOWLEDGE!";
+        sendto(rcv_src_sock, response, sizeof(response), 0, (struct sockaddr*) &src_addr, sizeof(src_addr));
 
         fflush(stdout);
 
