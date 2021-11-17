@@ -81,9 +81,11 @@ void thread_recv_jammer_data()
     pthread_exit(NULL);
 }
 
-int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr)
+int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr, int priority)
 {
     int rcv_src_sock, rt;
+    int priority, prio_from_sock, len_size);
+
     char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
     char if_name[32] = IF_NAME;
 
@@ -92,6 +94,22 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
         exit(errno);    
+    }
+
+    rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+    if (rt != 0)
+    {
+        printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
+    }
+
+    len_size = sizeof(prio_from_sock);
+    rt = getsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
+    if (rt != 0)
+    {
+        printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
+    } else
+    {
+        printf("Socket said to have priority [%d]\n", prio_from_sock);
     }
 
     if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
@@ -136,11 +154,11 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
     return rcv_src_sock;
 }
 
-void thread_recv_source_data()
+void thread_recv_source_data(void *args)
 {
 
     struct ifreq ifr;
-    int rc;
+    int rc, rt;
     char ctrl[4096], data[4096], buf[4096];
     struct cmsghdr *cmsg;
     struct sockaddr_in rcv_src_addr, src_addr;
@@ -150,13 +168,16 @@ void thread_recv_source_data()
     struct timespec now, start, diff, time_from_source, time_from_nic, t_prop;
     int16_t frame_type;
     int msgs_received, last_frame_id, len;
+    int priority, prio_from_sock, len_size);
+
+    priority = (int)*args;
 
     memset(data, 0, 4096);
     iov.iov_base = data;
     iov.iov_len = 4096;
 
     printf("Setup sink socket\n");
-    int server_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr);
+    int server_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr, priority);
     rc = listen(server_sock, 2);
     if (rc != 0)
     {
@@ -259,10 +280,19 @@ void thread_recv_source_data()
 int main(int argc, char* argv[])
 {
     int use_jammer = 0;
+    int priority = 0;
     if (argc >=2 && strcmp(argv[1], "jam") == 0 )
     {
         use_jammer = 1;
     }
+
+    if (argc == 2)
+    {
+        int prio = atoi(argv[1]);
+        printf("Passed arg %s; intepreted as priority [%d]\n", argv[1], prio);
+        if (prio >= 0 && prio <= 7) priority = prio;
+    }
+
 
     pthread_t recv_jammer, recv_source;
 
@@ -270,7 +300,7 @@ int main(int argc, char* argv[])
     {
         pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
     }
-    pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
+    pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, (void*)&priority);
 
     if (use_jammer)
     {
