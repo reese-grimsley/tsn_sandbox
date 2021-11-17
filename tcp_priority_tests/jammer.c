@@ -63,7 +63,7 @@ int setup_sock_udp(struct sockaddr_in* addr_sink, struct sockaddr_in* addr_jamme
 
 
     addr_sink->sin_family = AF_INET;
-    addr_sink->sin_port = htons(SINK_PORT);
+    addr_sink->sin_port = htons(SINK_PORT+1);
     addr_sink->sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
 
     addr_jammer->sin_family = AF_INET;
