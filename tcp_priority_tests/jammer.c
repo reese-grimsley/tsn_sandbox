@@ -58,8 +58,8 @@ int setup_sock_udp(struct sockaddr_in* addr_sink, struct sockaddr_in* addr_jamme
         exit(errno);
     }
 
-    memset(&addr_sink, 0, sizeof(addr_sink));
-    memset(&addr_jammer, 0, sizeof(addr_jammer));
+    memset(addr_sink, 0, sizeof(*addr_sink));
+    memset(addr_jammer, 0, sizeof(*addr_jammer));
 
 
     addr_sink->sin_family = AF_INET;
