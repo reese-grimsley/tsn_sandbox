@@ -43,7 +43,7 @@ struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 1000000};
 char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
 
 
-int setup_sock_udp(struct sockaddr_in* sink_addr)
+int setup_sock_udp(struct sockaddr_in* sink_addr, struct sockaddr_in addr_jammer)
 {
     int jammer_sock;
     char junk_data[MAX_UDP_PACKET_SIZE];
@@ -58,9 +58,25 @@ int setup_sock_udp(struct sockaddr_in* sink_addr)
         exit(errno);
     }
 
+    memset(&addr_sink, 0, sizeof(addr_sink));
+    memset(&addr_jammer, 0, sizeof(addr_jammer));
+
+
     sink_addr->sin_family = AF_INET;
     sink_addr->sin_port = SINK_PORT;
-    sink_addr->sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+    sink_addr->sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
+
+    addr_jammer->sin_family = AF_INET;
+    addr_jammer->sin_port = JAMMER_PORT;
+    addr_jammer->sin_addr.s_addr = inet_addr(JAMMER_IP_ADDR_VLAN);
+
+    rt = bind(jammer_sock, (struct sockaddr*) &addr_jammer, sizeof(addr_jammer));
+    if (rt != 0)	
+    {
+		perror("bind socket");
+		shutdown(jammer_sock,2);
+		exit(errno);
+	}
 
     return jammer_sock;
 
@@ -101,7 +117,7 @@ int main(int argc, char* argv[])
 {
     int jammer_sock;
 
-    struct sockaddr_in sink_addr;
+    struct sockaddr_in sink_addr, jammer_addr;
     char junk_data[MAX_UDP_PACKET_SIZE];
 
     struct sockaddr_ll addr;
@@ -115,7 +131,7 @@ int main(int argc, char* argv[])
     printf("Start jammer\n");
     
 #if USE_UDP
-    jammer_sock = setup_sock_udp(&sink_addr);
+    jammer_sock = setup_sock_udp(&sink_addr, &jammer_addr);
     memset(junk_data, '^', MAX_UDP_PACKET_SIZE);
 
 #else

@@ -11,6 +11,7 @@
 #define JAMMER_MAC_ADDR {0x54, 0xb2, 0x03, 0xf0, 0xd4, 0x68}  //54:b2:03:f0:d4:68
 #define JAMMER_IP_ADDR  "192.168.1.224"
 #define JAMMER_IP_ADDR_VLAN "10.0.1.103"
+#define JAMMER_PORT 15811
 
 #define ETH_INTERFACE_I225 "enp87s0\0"
 #define ETH_INTERFACE_I225_VLAN3 "enp87s0.3\0"
