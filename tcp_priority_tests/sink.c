@@ -265,6 +265,7 @@ void thread_recv_source_data(void *args)
         if (msgs_received % 50 == 0) fflush(log_file);
 
         // }
+        send(rcv_src_addr, (char*) "ACK", 4, 0);
 
         fflush(stdout);
 

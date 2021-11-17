@@ -180,10 +180,16 @@ int main(int argc, char* argv[])
         print_timespec(now);
         printf("\n");
 
+        char recv_data[32];
+        recv(send_sock, (void*)recv_data, 32, 0);
+
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
+        
         fflush(stdout);
         counter++;
+
+
     }
 
 
