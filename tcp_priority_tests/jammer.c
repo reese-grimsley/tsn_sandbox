@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     struct sockaddr_ll addr;
     struct ifreq ifr;
     struct ethernet_frame eth_frame;
-    char dest_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
+    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
     char src_addr[ETHER_ADDR_LEN+1] = JAMMER_MAC_ADDR;
 
     // memcpy(&dest_addr, &ADDRESS_TO_JAM, sizeof(dest_addr));
