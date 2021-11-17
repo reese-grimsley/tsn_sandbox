@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
         char recv_data[32];
         memset(recv_data, 0, 32);
         recv(send_sock, (void*)recv_data, 32, 0);
-        printf("Recived string from sink: [%s]", recv_data);
+        printf("Recived string from sink: [%s]\n", recv_data);
 
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
