@@ -96,11 +96,7 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
         exit(errno);    
     }
 
-    rt = setsockopt(rcv_src_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
-    if (rt != 0)
-    {
-        printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
-    }
+    set_socket_priority(rcv_src_sock, priority);
 
     len_size = sizeof(prio_from_sock);
     rt = getsockopt(rcv_src_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
@@ -194,6 +190,8 @@ void thread_recv_source_data(void *args)
 		exit(errno);
     }
 
+
+    set_socket_priority(rcv_src_sock, priority);
 
     // setup control messages; these are retrieved from the kernel/socket/NIC to get the hardware RX timestampß
     cmsg = (struct cmsghdr *) &ctrl;

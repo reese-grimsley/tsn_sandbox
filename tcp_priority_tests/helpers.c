@@ -277,3 +277,13 @@ int write_frame_time_to_csv(FILE* f, const struct timespec ts, int32_t frame_id,
 
     return 0;
 }
+
+int set_socket_priority(int sock, int priority)
+{
+    int rt;
+    rt = setsockopt(sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+    if (rt != 0)
+    {
+        printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
+    }
+}
