@@ -35,7 +35,7 @@
 #include "types.h"
 
 int go_slower = 1;
-struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 10000};
+struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 1000000};
 
 // char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
 char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
@@ -46,6 +46,7 @@ int setup_sock_udp(struct sockaddr_in* sink_addr)
     int jammer_sock;
     char junk_data[MAX_UDP_PACKET_SIZE];
 
+    printf("Configure jammer socket for UDP\n");
 
     
     jammer_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -66,7 +67,8 @@ int setup_sock_udp(struct sockaddr_in* sink_addr)
 int setup_sock_eth(struct sockaddr_ll* addr, struct ifreq* ifr)
 {
     int jammer_sock;
-    
+    printf("Configure jammer socket for raw ethernet\n");
+
     jammer_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_JAMMER));
     if(jammer_sock == -1)
     {
@@ -103,7 +105,7 @@ int main(int argc, char* argv[])
     struct sockaddr_ll addr;
     struct ifreq ifr;
     struct ethernet_frame eth_frame;
-    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+    char dest_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
     char src_addr[ETHER_ADDR_LEN+1] = JAMMER_MAC_ADDR;
 
     // memcpy(&dest_addr, &ADDRESS_TO_JAM, sizeof(dest_addr));
@@ -121,6 +123,8 @@ int main(int argc, char* argv[])
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
     memcpy(&eth_frame.source_mac, &src_addr, ETHER_ADDR_LEN );
     eth_frame.data_size_or_type = htons(ETH_P_JAMMER);
+
+    print_hex((char*)&eth_frame, 48);
 
     printf("Send data as fast as possible\n");
 
