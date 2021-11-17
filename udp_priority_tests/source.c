@@ -89,21 +89,6 @@ int main(int argc, char* argv[])
     memset(&addr_sink, 0, sizeof(addr_sink));
     memset(&addr_src, 0, sizeof(addr_src));
 
-    // rt = get_eth_index_num(&ifr);
-    // if (rt == -1)
-    // {
-    //     printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
-    //     shutdown(send_sock, 2);
-    //     exit(errno);
-    // }
-    // printf("Using network interface %d\n", ifr.ifr_ifindex);
-
-    // if (setsockopt(send_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
-	// 	perror("SO_BINDTODEVICE");
-	// 	shutdown(send_sock,2);
-	// 	exit(errno);
-	// }
-
     addr_sink.sin_family = AF_INET;
     addr_sink.sin_port = htons(SINK_PORT);
     addr_sink.sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
@@ -111,14 +96,6 @@ int main(int argc, char* argv[])
     addr_src.sin_family = AF_INET;
     addr_src.sin_port = htons(SINK_PORT);
     addr_src.sin_addr.s_addr = inet_addr(SOURCE_IP_ADDR_VLAN);
-
-    // addr_sink.sll_ifindex = ifr.ifr_ifindex;
-
-	// if (inet_aton(SINK_IP_ADDR , &addr_sink.sin_addr) == 0) 
-	// {
-	// 	fprintf(stderr, "inet_aton() failed\n");
-	// 	exit(1);
-	// }
 
     rt = bind(send_sock, (struct sockaddr*) &addr_src, sizeof(addr_src));
     if (rt != 0)	

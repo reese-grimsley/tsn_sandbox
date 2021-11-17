@@ -2,7 +2,7 @@
  * 
  * The Jammer will inject traffic into a raw socket as quickly as it can.
  *      However, we're using a 2.5Gbps capable NIC, so it's unlikely it is anywhere near saturation..
- *      We will send through UDP, as this is the simplest thing to do
+ *      We will send through UDP or ethernet
  *          However, strange cases have been observed where the switch routes traffic through a totally different
  *          interface like wireless. This will not suitably slow traffic intended for the ethernet NIC of the sink
  * 
@@ -11,7 +11,7 @@
  *     MAC address of each device (sink, jammer, and source) are assumed within the constants.h file
  * 
  * Author: Reese Grimsley
- * Created: 10/29/21
+ * Created: 11/15/21
  * 
  * Raw sockets references:
  *  https://www.binarytides.com/raw-sockets-c-code-linux/
@@ -34,10 +34,10 @@
 #include "constants.h"
 #include "types.h"
 
-#define USE_UDP 1
+#define USE_UDP 0
 
 int go_slower = 1;
-struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 1000000};
+struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 1000};
 
 // char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
 char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
