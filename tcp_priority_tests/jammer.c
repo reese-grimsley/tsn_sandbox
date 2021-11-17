@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 
         if (go_slower)
         {
-            wait(&wait_duration, 0);
+            wait(wait_duration, 1);
 
         }
 
