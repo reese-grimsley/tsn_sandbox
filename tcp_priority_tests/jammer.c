@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     while(1)
     {
 #if USE_UDP
-        sendto(jammer_sock, junk_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &sink_addr, sizeof(sink_addr));
+        int rc = sendto(jammer_sock, junk_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &sink_addr, sizeof(sink_addr));
 #else
         int rc = sendto(jammer_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
 #endif
