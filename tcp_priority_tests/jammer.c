@@ -70,7 +70,7 @@ int setup_sock_udp(struct sockaddr_in* addr_sink, struct sockaddr_in* addr_jamme
     addr_jammer->sin_port = JAMMER_PORT;
     addr_jammer->sin_addr.s_addr = inet_addr(JAMMER_IP_ADDR_VLAN);
 
-    rt = bind(jammer_sock, (struct sockaddr*) &addr_jammer, sizeof(addr_jammer));
+    rt = bind(jammer_sock, (struct sockaddr*) addr_jammer, sizeof(*addr_jammer));
     if (rt != 0)	
     {
 		perror("bind socket");
