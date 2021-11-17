@@ -34,6 +34,10 @@
 #include "constants.h"
 #include "types.h"
 
+int go_slower = 1;
+struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 10000};
+
+
 int setup_sock_udp(struct sockaddr_in* sink_addr)
 {
     int jammer_sock;
@@ -126,6 +130,13 @@ int main(int argc, char* argv[])
             // perror("socket fail");
             continue;
         }
+
+        if (go_slower)
+        {
+            wait(&wait_duration, 0);
+
+        }
+
     }
     printf("Done\n");
 
