@@ -37,6 +37,9 @@
 int go_slower = 1;
 struct timespec wait_duration = {.tv_sec=0, .tv_nsec= 10000};
 
+// char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+char ADDRESS_TO_JAM[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
+
 
 int setup_sock_udp(struct sockaddr_in* sink_addr)
 {
@@ -100,7 +103,7 @@ int main(int argc, char* argv[])
     struct sockaddr_ll addr;
     struct ifreq ifr;
     struct ethernet_frame eth_frame;
-    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+    char dest_addr[ETHER_ADDR_LEN+1] = ADDRESS_TO_JAM;
     char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
 
     printf("Start jammer\n");
