@@ -134,16 +134,16 @@ int main(int argc, char* argv[])
 		shutdown(send_sock,2);
 		exit(errno);
 	}
-    printf("Binded source to VLAN address %s", SOURCE_IP_ADDR_VLAN);
+    printf("Binded source to VLAN address %s\n", addr_src.sin_addr.s_addr);
 
     rt = connect(send_sock, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
     if (rt != 0)	
     {
-		perror("bind socket");
+		perror("connect socket");
 		shutdown(send_sock,2);
 		exit(errno);
 	}
-    printf("Connected source to sink at VLAN address %s", SINK_IP_ADDR_VLAN);
+    printf("Connected source to sink at VLAN address %s\n", addr_sink.sin_addr.s_addr);
 
 
     union tcp_packet pkt;
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
         memcpy(&pkt.ss_payload.tx_time, (void*) &now, sizeof(now));
 
         pkt.ss_payload.frame_id = counter;
-        print_hex(pkt.data, 40); printf("\n");
+        // print_hex(pkt.data, 40); printf("\n");
 
 
         int rc = sendto(send_sock, (void*) &pkt, sizeof(pkt), 0, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        printf("send msg %d of  %d bytes at ", counter, rc);
+        printf("send msg %d of %d bytes at ", counter, rc);
         print_timespec(now);
         printf("\n");
 
