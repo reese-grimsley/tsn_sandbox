@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 		shutdown(send_sock,2);
 		exit(errno);
 	}
-    printf("Binded source to VLAN address %s\n", addr_src.sin_addr.s_addr);
+    printf("Bound source to VLAN address %s\n", SOURCE_IP_ADDR_VLAN);
 
     rt = connect(send_sock, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
     if (rt != 0)	
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 		shutdown(send_sock,2);
 		exit(errno);
 	}
-    printf("Connected source to sink at VLAN address %s\n", addr_sink.sin_addr.s_addr);
+    printf("Connected source to sink at VLAN address %s\n", SINK_IP_ADDR_VLAN);
 
 
     union tcp_packet pkt;
