@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -lpthread  -g0 -I=./libs
+CFLAGS = -lpthread  -g0 -I./libs
 
 libs: 
 	$(CC) -c helpers.c $(CFLAGS)
@@ -34,4 +34,4 @@ tcp_source: libs
 all: eth_jammer udp_jammer eth_sink eth_source udp_sink udp_source tcp_sink tcp_source 
 
 clean:
-	rm -f jammer.out sink.out source.out
+	rm -f helpers.o eth_jammer.out udp_jammer.out eth_sink.out eth_source.out udp_sink.out udp_source.out tcp_sink.out tcp_source.out
