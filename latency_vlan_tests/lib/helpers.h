@@ -39,6 +39,7 @@ int get_num_leapseconds(void);
 int configure_hw_timestamping(int sock_fd);
 int get_hw_timestamp_from_msg(struct msghdr* msg, struct timespec* ts);
 int get_eth_index_num(struct ifreq* ifr);
+int set_socket_priority(int sock, int priority);
 
 void print_timespec(const struct timespec ts);
 void time_diff(const struct timespec * last_time, const struct timespec * current_time, struct timespec* diff);
