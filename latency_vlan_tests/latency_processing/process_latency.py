@@ -1,20 +1,22 @@
-from pandas.core import frame
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-LATENCY_FILENAME_JAMMER = 'latency_jammer.log'
-LATENCY_FILENAME_NO_JAMMER = 'latency_no_jammer.log'
+LATENCY_FILENAME_JAMMER = 'eth/L2_latency_jammer.log'
+LATENCY_FILENAME_NO_JAMMER = 'eth/L2_latency_no_jammer.log'
+LATENCY_FILE_COLUMNS = ['test_id', 'priority', 'frame_id', 'latency']
 
 MAX_SAMPLES = 1000
+LATENCY_LOWER_LIM_MICROSEC = 100
 
 def read_latency_log(filename=LATENCY_FILENAME_JAMMER):
+    '''
+    Read the file containing latency logs as a pandas dataframe
+    '''
 
     #I wish I actually understood regex. Thanks SO: https://stackoverflow.com/a/10341729/14824181
-    separator = "\s?[, ]\s?" #error in the data where one column was missing a comma
-    all_data = pd.read_csv(filename, 
-        names=['test_id', 'priority', 'frame_id', 'latency'],
-        sep=separator)
+    separator = "\s?[, ]\s?" #error in the data where one column was missing a comma. Still works if the CSV is properly formatted, but will treat any whitespace as a valid separator
+    all_data = pd.read_csv(filename, names=LATENCY_FILE_COLUMNS, sep=separator)
 
     test_ids = all_data['test_id'].unique()
 
@@ -24,14 +26,12 @@ def read_latency_log(filename=LATENCY_FILENAME_JAMMER):
         ts = all_data.loc[all_data['test_id'] == ti]
 
         test_sets.append(ts)
-        print(ts)
 
-    # print(test_sets)
 
     return test_sets
 
 
-def histogram_of_latencies(latency_df, is_jammed, use_default_bins=True):
+def histogram_of_latencies(latency_df, is_jammed):
 
     test_ids = latency_df['test_id'].unique()
     if len(test_ids) != 1:
@@ -45,16 +45,15 @@ def histogram_of_latencies(latency_df, is_jammed, use_default_bins=True):
     print("Show histogram for test_id %d, priority %d" % (test_id, priority))
 
     latencies = pd.array(latency_df['latency'])
-    weights = np.ones_like(latencies)/len(latencies)
+    weights = np.ones_like(latencies)/len(latencies) #equal weighting for each sample to show as probability mass function
 
-    # if use_default_bins:
-    #     bins = 
-    plt.hist(latencies * 1e6, 15, weights=weights)
+    num_bins = 15
+    plt.hist(latencies * 1e6, num_bins, weights=weights)
 
     plt.ylabel('Likelihood per Bin (of %d samples)' % len(latencies))
     plt.xlabel('Latency (us)')
 
-    plt.gca().set_xlim(left=100) #never seen less than 120 us
+    plt.gca().set_xlim(left=LATENCY_LOWER_LIM_MICROSEC) #never seen less than 120 us
 
 
     title = 'Latency Histogram for VLAN priority %d with %sJamming' % (priority, '' if is_jammed else 'No ' )
@@ -63,6 +62,14 @@ def histogram_of_latencies(latency_df, is_jammed, use_default_bins=True):
     plt.show()
 
 def plot_stats(results):
+    '''
+    Plot the statistics for the latencies, both with and without the jammer, for each VLAN priority
+
+    We'll show latency with error bars (logy) and packet drop rate (probability, linear). 
+
+    :param results: an array of 'results', where each entry is a tuple of the form: (test_id, priority, is_jamming, sample_size, mean, std, median, drop_rate, entire_raw_dataframe)
+    '''
+
     #entries are tuples (test_id, priority, is_jamming, sample_size, mean, std, median, drop_rate, df)
 
     means_jam = [0 for i in range(8)]
@@ -74,18 +81,12 @@ def plot_stats(results):
     num_samples_jam = ['' for i in range(8)]
     num_samples_nojam = ['' for i in range(8)]
 
-    print(drop_rates_jam)
-
-
     fig = plt.figure()
     pl = fig.add_subplot(1, 1, 1)
     ax1 = plt.gca()
 
     ax2 = ax1.twinx()
-    jammer_line = None
-    nojammer_line = None
     for r in results:
-        print(r[:-2])
         if r[2]: #jamming
             means_jam[r[1]] = r[4]
             stds_jam[r[1]] = r[5]
@@ -190,7 +191,7 @@ if __name__ == "__main__":
 
     print(results)
     print("Let's plot some stats")
-    # plot_stats(results)
+    plot_stats(results)
 
 
     print("stop")

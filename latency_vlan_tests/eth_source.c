@@ -46,6 +46,25 @@ int main(int argc, char* argv[])
     int rt; 
     int priority, prio_from_sock;
     int len_size = sizeof(prio_from_sock);
+    int modify_prio;
+    struct sockaddr_ll addr;
+    struct ifreq ifr;
+
+
+    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
+    char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
+
+    if (argc == 2)
+    {
+        priority = atoi(argv[1]);
+        modify_prio = 1;
+    }
+    else 
+    {
+        printf("Using default priority for this network interface, if applicable\n");
+        priority = 0;
+        modify_prio = 0;
+    }
 
     srand ( time(NULL) );
     int32_t test_id = random();
@@ -57,24 +76,25 @@ int main(int argc, char* argv[])
         exit(errno);
     }   
 
-    priority = 3;
-    rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
-    if (rt != 0)
+    if (modify_prio)
     {
-        printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
-    }
+        rt = setsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+        if (rt != 0)
+        {
+            printf("Failed to set priority [%d] for socket; errno: [%d]\n", priority, errno);
+        }
 
-    rt = getsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
-    if (rt != 0)
-    {
-        printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
-    } else
-    {
-        printf("Socket supposedly has priority [%d]\n", prio_from_sock);
-    }
 
-    struct sockaddr_ll addr;
-    struct ifreq ifr;
+        rt = getsockopt(send_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
+        if (rt != 0)
+        {
+            printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
+        } 
+        else
+        {
+            printf("Socket supposedly has priority [%d]\n", prio_from_sock);
+        }
+    }
 
     memset(&addr, 0, sizeof(addr));
 
@@ -92,21 +112,13 @@ int main(int argc, char* argv[])
     addr.sll_ifindex = eth_interface_index;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_pkttype = PACKET_OTHERHOST;
-    
-    char dest_addr[ETHER_ADDR_LEN+1] = SINK_MAC_ADDR;
-    char src_addr[ETHER_ADDR_LEN+1] = SOURCE_MAC_ADDR;
+
     memset(&(addr.sll_addr), 0, sizeof(addr.sll_addr));
     memcpy(&(addr.sll_addr), &dest_addr, ETHER_ADDR_LEN);
 
-
     //setup packets and send over ethernet
-    // struct ether_tsn tsn_ethernet;
-    // struct ethernet_frame_8021Q eth_frame;
-    // eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
     struct ethernet_frame eth_frame;
-    // memset(&eth_frame, 0, sizeof(eth_frame));
-    // eth_frame.TCI.tci_int = (htonl((ETH_P_VLAN << 16) | priority << 13 | VLAN_ID));
-
+    memset(&eth_frame, 0, sizeof(eth_frame));
 
     //recall communications typically use little-endian
     memcpy(&eth_frame.destination_mac, &dest_addr, ETHER_ADDR_LEN);
