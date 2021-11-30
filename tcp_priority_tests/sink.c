@@ -44,50 +44,10 @@
 #include "types.h"
 
 
-/**
- * Receive data that the jammer is sending. 
- * This is not explicitly necessary for the device to be affected by the traffic
- * Viewing traffic through 'nload' CLI program is sufficient to assert the device is receiving tons of data
- */ 
-void thread_recv_jammer_data()
-{
-    char recv_data[MAX_UDP_PACKET_SIZE];
-    struct sockaddr_in jammer_recv_addr, jammer_send_addr;
-    socklen_t sizeof_send_addr;
-    int rcv_jam_sock;
-
-    
-    sizeof_send_addr = sizeof(jammer_send_addr);
-
-    rcv_jam_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if( rcv_jam_sock == -1)
-    {
-        printf("Recv-from-jammer socket returned err: [%d]\n", errno);
-        exit(errno);    
-    }
-
-    jammer_recv_addr.sin_family = AF_INET;
-    jammer_recv_addr.sin_port = SINK_PORT;
-    jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
-
-    bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
-
-    while(1)
-    {
-        recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
-        printf("recv jammer pkt\n");
-    }
-
-    pthread_exit(NULL);
-}
-
 int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr, int priority)
 {
     int rcv_src_sock, rt;
     int prio_from_sock, len_size;
-
-    char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
-    char if_name[32] = IF_NAME;
 
     rcv_src_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //e.g. ETH_P_TSN
     if( rcv_src_sock == -1)
@@ -130,14 +90,6 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
     rcv_src_addr->sin_port = htons(SINK_PORT);
     rcv_src_addr->sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
 
-
-    // addr_sink.sll_ifindex = ifr.ifr_ifindex;
-
-	// if (inet_aton(SINK_IP_ADDR , &addr_sink.sin_addr) == 0) 
-	// {
-	// 	fprintf(stderr, "inet_aton() failed\n");
-	// 	exit(1);
-	// }
 
     rt = bind(rcv_src_sock, (struct sockaddr*) rcv_src_addr, sizeof(*rcv_src_addr));
     if (rt != 0)	
@@ -190,7 +142,6 @@ void thread_recv_source_data(void *args)
 		exit(errno);
     }
 
-
     set_socket_priority(rcv_src_sock, priority);
 
     // setup control messages; these are retrieved from the kernel/socket/NIC to get the hardware RX timestampß
@@ -206,7 +157,7 @@ void thread_recv_source_data(void *args)
 
     msgs_received = 0;
     last_frame_id = -1;
-    FILE* log_file = fopen("source_sink_latency.csv", "a");
+    FILE* log_file = fopen("tcp_source_sink_latency.csv", "a");
 
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
@@ -217,13 +168,10 @@ void thread_recv_source_data(void *args)
     while(msgs_received < LATENCY_SAMPLES_TO_LOG) 
     {
         int msg_size;
-        msg_size = recvmsg(rcv_src_sock, &msg, 0);
-
-        // if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(frame_type) )
-        // {
         union tcp_packet* pkt;
         int32_t frame_id, priority, test_id;
 
+        msg_size = recvmsg(rcv_src_sock, &msg, 0);
         msgs_received++;
 
         //this is a frame we want.
@@ -262,7 +210,6 @@ void thread_recv_source_data(void *args)
         //ensure some data gets written in case of intermittent failure
         if (msgs_received % 50 == 0) fflush(log_file);
 
-        // }
         char response[32] = "ACKNOWLEDGE!";
         sendto(rcv_src_sock, response, sizeof(response), 0, (struct sockaddr*) &src_addr, sizeof(src_addr));
 
@@ -281,10 +228,6 @@ int main(int argc, char* argv[])
 {
     int use_jammer = 0;
     int priority = 0;
-    if (argc >=2 && strcmp(argv[1], "jam") == 0 )
-    {
-        use_jammer = 1;
-    }
 
     if (argc == 2)
     {
@@ -293,19 +236,10 @@ int main(int argc, char* argv[])
         if (prio >= 0 && prio <= 7) priority = prio;
     }
 
+    pthread_t recv_source;
 
-    pthread_t recv_jammer, recv_source;
-
-    if (use_jammer)
-    {
-        pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
-    }
     pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, (void*)&priority);
 
-    if (use_jammer)
-    {
-        pthread_join(recv_jammer, NULL);
-    }
     pthread_join(recv_source, NULL);
 
     printf("Exiting sink\n");

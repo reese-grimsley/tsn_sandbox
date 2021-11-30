@@ -38,7 +38,7 @@
 
 struct timespec WAIT_DURATION = {.tv_sec = 1, .tv_nsec = 00000000};
 
-int default_priority = 3;
+int default_priority = 0;
 
 int main(int argc, char* argv[])
 {

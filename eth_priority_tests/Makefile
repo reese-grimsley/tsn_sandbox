@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -lpthread  -g0
+CFLAGS = -lpthread  -g0 -I=../libs
 
 libs: 
 	$(CC) -c helpers.c $(CFLAGS)

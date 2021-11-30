@@ -44,43 +44,6 @@
 #include "types.h"
 
 
-/**
- * Receive data that the jammer is sending. 
- * This is not explicitly necessary for the device to be affected by the traffic
- * Viewing traffic through 'nload' CLI program is sufficient to assert the device is receiving tons of data
- */ 
-void thread_recv_jammer_data()
-{
-    char recv_data[MAX_UDP_PACKET_SIZE];
-    struct sockaddr_in jammer_recv_addr, jammer_send_addr;
-    socklen_t sizeof_send_addr;
-    int rcv_jam_sock;
-
-    
-    sizeof_send_addr = sizeof(jammer_send_addr);
-
-    rcv_jam_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if( rcv_jam_sock == -1)
-    {
-        printf("Recv-from-jammer socket returned err: [%d]\n", errno);
-        exit(errno);    
-    }
-
-    jammer_recv_addr.sin_family = AF_INET;
-    jammer_recv_addr.sin_port = SINK_PORT;
-    jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
-
-    bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
-
-    while(1)
-    {
-        recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
-        printf("recv jammer pkt\n");
-    }
-
-    pthread_exit(NULL);
-}
-
 int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_ll *rcv_src_addr)
 {
     int rcv_src_sock, rc;
@@ -164,7 +127,7 @@ void thread_recv_source_data()
 
     tsn_msgs_received = 0;
     last_frame_id = -1;
-    FILE* log_file = fopen("source_sink_latency.csv", "a");
+    FILE* log_file = fopen("eth_source_sink_latency.csv", "a");
 
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
@@ -196,8 +159,8 @@ void thread_recv_source_data()
             test_id = payload.ss_payload.test_id;
 
             printf("[%d]th TSN frame with priority [%d]!\n", tsn_msgs_received, priority);
-
-
+            
+            //calculate and log latency as differences between software timestamp prior to TX and hardware timestamp of RX. To get hardware TX timestamp, need 2 messages. 
             if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
             {
                 memset(&t_prop, 0, sizeof(t_prop));
@@ -223,7 +186,6 @@ void thread_recv_source_data()
             if (tsn_msgs_received % 50 == 0) fflush(log_file);
 
         }
-
         fflush(stdout);
 
     }
@@ -238,23 +200,11 @@ void thread_recv_source_data()
 int main(int argc, char* argv[])
 {
     int use_jammer = 0;
-    if (argc >=2 && strcmp(argv[1], "jam") == 0 )
-    {
-        use_jammer = 1;
-    }
 
     pthread_t recv_jammer, recv_source;
 
-    if (use_jammer)
-    {
-        pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
-    }
     pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
 
-    if (use_jammer)
-    {
-        pthread_join(recv_jammer, NULL);
-    }
     pthread_join(recv_source, NULL);
 
     printf("Exiting sink\n");
