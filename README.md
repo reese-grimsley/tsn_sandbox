@@ -24,7 +24,7 @@ Please find a few additional notes on the hardware capabilities and constraints 
   * [Over UDP](latency_vlan_tests/README.md#UDP)
   * [Over TCP](latency_vlan_tests/README.md#TCP)
   * [Latency Log Processing](latency_vlan_tests/latency_processing/README.md)
-* [Errata and other Mentionables](info_and_errata.md)  
+* [Errata and Other Mentionables](info_and_errata.md)  
 
 ## What is TSN?
 
