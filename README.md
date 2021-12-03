@@ -10,7 +10,7 @@ We have small network of three endpoint devices running linux, connected to a TS
 
 Each endpoint is an Intel NUC (**NUC11TNHv5**) running stock **Ubuntu 20.04 LTS**. They each have an Intel **i225-LM** Ethernet NICs (Network Interface Card) for hardware timestamping, queue management for QoS, and a few other TSN capabilities.  
 
-The switch is a Belden/Hirschmann **BRS40-8TX** managed layer 2 switch for industrial applications (which we'll refer to as the 'switch' or 'TSN switch'). During the development of this codebase, it was running HiOS 8.7.02-S.
+The switch is a Belden/Hirschmann **BRS40-8TX** managed layer 2 switch for industrial applications (which we'll refer to as the 'switch' or 'TSN switch'). Your mileage may vary for other brands of switches as they do not necessarily implement all of the same standards. During the development of this codebase, it was running HiOS 8.7.02-S. To date, we have almost solely used the GUI for modifying switch configurations, although it appears to be missing a few minor features related to TSN's TDMA-style traffic shaping that the CLI *does* offer.
 
 Please find a few additional notes on the hardware capabilities and constraints in <TODO!>.
 
@@ -30,7 +30,7 @@ Please find a few additional notes on the hardware capabilities and constraints 
 
 As a whole, TSN is composed of 3 elements: time synchronization, traffic shaping / Quality of Service, and stream reservation / enforcement.  
 
-These are generally encompassed in the 802.1Q standards from IEEE; TSN is not a standard in-and-of-itself, but an umbrella term for a *collection* of standards. TSN was borne from [Audio-Video Bridging](https://en.wikipedia.org/wiki/Audio_Video_Bridging) as the standards evolved and industrial domains realized their value in applications like factory automation. Note that time sychronization in TSN is effectively just the [Precision Time Protocol](https://en.wikipedia.org/wiki/Precision_Time_Protocol), which is governed under IEEE 1588 (and a sister specification for a simplified PTP configuration called generic PTP or [802.1AS](https://www.ieee802.org/1/pages/802.1as.html))
+These are generally encompassed in the 802.1Q standards from IEEE; TSN is not a standard in-and-of-itself, but an umbrella term for a *collection* of standards. TSN was borne from [Audio-Video Bridging](https://en.wikipedia.org/wiki/Audio_Video_Bridging) as the standards evolved and industrial domains realized their value in applications like factory automation. Note that time sychronization in TSN is effectively just the [Precision Time Protocol](https://en.wikipedia.org/wiki/Precision_Time_Protocol), which is governed under IEEE 1588 (and a sister specification for a simplified PTP configuration called generic PTP or [802.1AS](https://www.ieee802.org/1/pages/802.1as.html)). To reiterate, **TSN itself is not a standard; it refers to the overall concept of layer 2 networking with time-determinism.**
 
 You may find a fairly technical slide deck from [Onera](https://www.onera.fr/en) that conscisely describes these standards and their purposes [here](https://www.onera.fr/sites/default/files/323/Slides-TSN-Training-public.pdf). A [white paper for Belden](https://www.belden.com/hubfs/resources/knowledge/white-papers/tsn-time-sensitive-networking.pdf) is also a useful read on the motivations and components of TSN, and the [AVNU Alliance](https://avnu.org/) similarly has helpful resources (albeit geared towards TSN product design) on concepts and best practices.
 

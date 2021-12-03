@@ -4,7 +4,13 @@ This page is dedicated to a lower priority information and known errors.
 
 ## Additional Info
 
-* The TSN switch will store its current configuration in memory, and upon reset, load the configuration held in NVM (Non-Voaltile Memory). This means that if the configuration is not saved to NVM, it will need to be reconfigured when it reboots. By default, the switch does not synchronize these the configurations, but will if the appropriate box is checked in the configuration management interface (the save/floppy-disk icon in the upper left)
+### Switch
+
+* The TSN switch will store its current configuration in memory, and upon reset, load the configuration held in NVM (Non-Voaltile Memory). This means that if the configuration is not saved to NVM, it will need to be reconfigured when it reboots. By default, the switch does not synchronize these the configurations, but will if the appropriate box is checked in the configuration management interface (the save/floppy-disk icon in the upper left).
+
+### VLAN 
+
+* VLAN priorities and Linux traffic classes are not the same. The network interface will translate between these using an egress and ingress mapping. By default, all but 0, 1, and 2 are mapped one-to-one (e.g., traffic class 5 -> priority 5; assume traffic class > 7 maps to priority 7). The popular convention is to consider traffic class 0 (default in Linux) as priority 2 (best effort), class 1 as priority 0, and class 2 as priority 1. Strange, but consistent. The TSN switch we use follows the same convention. In VLAN configuration terms, that would look like a QoS mapping of 0:2 1:0 2:1 3:3 4:4 ... .
 
 ## Errata
 
