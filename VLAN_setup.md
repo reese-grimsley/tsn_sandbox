@@ -24,7 +24,7 @@ sudo ip link add link enp87s0 name enp87s0.3 type vlan id 3
 
 ### Setting Egress traffic maping
 
-Next, we'll set the egress mapping between traffic classes and VLAN priorities. Note that you may manipulate the traffic class at the socket level with [setsockopt](https://man7.org/linux/man-pages/man2/setsockopt.2.html) and SO_PRIORITY. There is a helper function, set_socket_priority in [helpers.c](latency_vlan_tests/helpers.h) that will do this.
+Next, we'll set the egress mapping between traffic classes and VLAN priorities. Note that you may manipulate the traffic class at the socket level with [setsockopt](https://man7.org/linux/man-pages/man2/setsockopt.2.html) and SO_PRIORITY. There is a helper function, set_socket_priority in [helpers.h](latency_vlan_tests/helpers.h) that will do this.
 
 ```
 sudo ip link set enp87s0.3 type vlan egres 0:2 1:1 2:0 3:3 4:4 5:5 6:6 7:7

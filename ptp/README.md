@@ -10,9 +10,9 @@ As described in the [Errata](../info_and_errata.md#errata), it is not recommende
 
 ## Synchronization and ptp4l
 
-In Linux, the [ptp4l](https://linux.die.net/man/8/ptp4l) utility (PTP for Linux) will handle synchronization according to a [configuration file](https://github.com/openil/linuxptp/tree/master/configs). 
+In Linux, the [ptp4l](https://linux.die.net/man/8/ptp4l) utility (PTP for Linux) will handle synchronization according to a [configuration file](https://github.com/openil/linuxptp/tree/master/configs).
 
-The .conf and .cfg files provide the minimum necessary configuration options, as there are far too many parameters to provide directly in the command line. Although unspecified, ptp4l should automatically determine the ethernet NIC as its interface of choice, although that may require explicit selection in the configuration file is multiple are present
+The .conf and .cfg files provide the configuration options, as there are far too many parameters to provide directly in the command line. Although unspecified, ptp4l should automatically determine the ethernet NIC as its interface of choice, although that may require explicit selection in the configuration file is multiple are present.
 
 ## System Clock and NIC Clock with phc2sys
 

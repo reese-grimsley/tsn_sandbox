@@ -54,4 +54,4 @@ There is no guarantee this will work on an arbitrary Linux distribution or with 
 
 ## License
 
-TBD, but MIT is always a great option.  
+MIT
