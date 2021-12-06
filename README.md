@@ -54,7 +54,7 @@ Yes. In our experience (as of 2021), time synchronization and QoS management is 
 
 Existing implementations like [OpenAVNU](https://github.com/Avnu/OpenAvnu) and [iotg_tsn_ref_sw](https://github.com/intel/iotg_tsn_ref_sw) have very specific hardware and software requirements, including custom linux kernels and out-of-date network drivers. A somewhat dated set of documents for [TSN for Linux](https://tsn.readthedocs.io/) covers VLANs, traffic shaping, and time synchronization, but does not include any note of stream reservation.
 
-Further, the i225 NIC and TSN switch do not indicate they support this technology (standards 802.1Qat and 802.1Qcc for resevation and centralized coordination, respecitvely) as of December 2021, although future software versions might introduce this.  
+Further, the i225 NIC and TSN switch do not indicate they support this technology (standards 802.1Qat and 802.1Qcc for reservation and centralized coordination, respectively) as of December 2021, although future software/firmware updates might introduce this.  
 
 This repository is instead focused on time synchronization, VLAN configuration for traffic prioritization, and LAN stress tests to verify the two latter points.  
 
