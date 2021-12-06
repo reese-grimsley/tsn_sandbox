@@ -136,7 +136,8 @@ void thread_recv_source_data(void *args)
     struct iovec iov;
     struct timespec now, start, diff, time_from_source, time_from_nic, t_prop;
     int16_t frame_type;
-    int msgs_received, last_frame_id, len;
+    int32_t msgs_received, last_frame_id, last_test_id;
+    int len;
     int priority;
 
     priority = *((int*) args);
@@ -178,6 +179,7 @@ void thread_recv_source_data(void *args)
 
     msgs_received = 0;
     last_frame_id = -1;
+    last_test_id = -1;
     FILE* log_file = fopen("tcp_source_sink_latency.csv", "a");
 
     clock_gettime(CLOCK_REALTIME, &start);
@@ -217,9 +219,9 @@ void thread_recv_source_data(void *args)
             printf("\n-----\n");
 
             //keep logs consistent within the same test
-            if (last_frame_id != -1 && last_frame_id > frame_id)
+            if ((last_frame_id != -1 && last_frame_id > frame_id) ||
+                (last_test_id != -1 && test_id != last_test_id)) 
             {
-                fclose(log_file);
                 break;
             }
 
@@ -228,6 +230,7 @@ void thread_recv_source_data(void *args)
 
         }
         last_frame_id = frame_id;
+        last_test_id = test_id;
         //ensure some data gets written in case of intermittent failure
         if (msgs_received % 50 == 0) fflush(log_file);
 

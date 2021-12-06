@@ -165,8 +165,6 @@ int main(int argc, char* argv[])
         memcpy(&eth_frame.payload.ss_payload.tx_time, (void*) &now, sizeof(now));
 
         eth_frame.payload.ss_payload.frame_id = counter;
-        print_hex(eth_frame.payload.data, 40); printf("\n");
-
 
         int rc = sendto(send_sock, (void*) &eth_frame, sizeof(eth_frame), 0, (struct sockaddr*) &addr, sizeof(addr));
         if (rc < 0)
@@ -178,7 +176,8 @@ int main(int argc, char* argv[])
 
         printf("send msg %d of  %d bytes at ", counter, rc);
         print_timespec(now);
-        printf("\n");
+        printf("\nPart of Ethernet header:\n");
+        print_hex(eth_frame.payload.data, 40); printf("\n");
 
         int no_print = 1;
         wait(WAIT_DURATION, no_print);

@@ -16,7 +16,7 @@ The .conf and .cfg files provide the configuration options, as there are far too
 
 ## System Clock and NIC Clock with phc2sys
 
-PTP will synchronize the clocks within the network interface. However, the system clock within Linux does not track this by default. The two have to be linked, typically with the [phc2sys utility](https://manpages.ubuntu.com/manpages/focal/en/man8/phc2sys.8.html).
+PTP will synchronize the clocks within the network interface. However, the system clock within Linux doesx not track this by default. The two have to be linked, typically with the [phc2sys utility](https://manpages.ubuntu.com/manpages/focal/en/man8/phc2sys.8.html).
 
 The grand master's NIC clock should be based on that device's system clock, and every other device's system clock should be based on their NIC clock. This means the phc2sys configuration must be aware of whether the device is the grand master clock or not.
 

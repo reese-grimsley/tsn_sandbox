@@ -17,7 +17,7 @@ Please find a few additional notes on the hardware capabilities and constraints 
 ## Repo Contents
 
 * [PTP Configuration](ptp/README.md)
-  * [gPTP Configuration](ptp/gptpREADME.md)
+  * [gPTP Configuration](ptp/gptp/README.md)
 * [VLAN Configuration](VLAN_setup.md)
 * [VLAN Latency Testing](latency_vlan_tests/README.md)
   * [Over Ethernet](latency_vlan_tests/README.md#Ethernet)
@@ -25,6 +25,18 @@ Please find a few additional notes on the hardware capabilities and constraints 
   * [Over TCP](latency_vlan_tests/README.md#TCP)
   * [Latency Log Processing](latency_vlan_tests/latency_processing/README.md)
 * [Errata and Other Mentionables](info_and_errata.md)  
+
+### Order of Operations
+
+* Setup endpoint devices with Ubuntu 20.04 LTS or newer
+* Install [switch software](https://catalog.belden.com/index.cfm?event=browse&c=Category_187194&n=10&sr=1&sby=relevancy&miscellaneousid=BOBCAT) (HiOS 8.7 or newer)
+* Connect endpoints to switch(s) with ethernet cables
+  * Connect switch(s) to LAN that your host machine can access..
+* Configure and activate [gPTP/802.1AS](ptp/gptp/README.md)
+* Create [VLANs](VLAN_setup.md)
+* Setup Gate Control Lists in Switch
+* Create and run applications that run on top of configured VLAN(s)
+  * NB: If using TCP, both sides of the connection should use the same VLAN/priority, *e.g.*, the MQTT broker should bind itself to an IP on the same VLAN as the clients.
 
 ## What is TSN?
 

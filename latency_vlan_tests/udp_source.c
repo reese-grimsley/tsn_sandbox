@@ -118,21 +118,6 @@ int main(int argc, char* argv[])
     memset(&addr_sink, 0, sizeof(addr_sink));
     memset(&addr_src, 0, sizeof(addr_src));
 
-    // rt = get_eth_index_num(&ifr);
-    // if (rt == -1)
-    // {
-    //     printf("Failed to get ethernet interface index number; shutdown. errno [%d]", errno);
-    //     shutdown(send_sock, 2);
-    //     exit(errno);
-    // }
-    // printf("Using network interface %d\n", ifr.ifr_ifindex);
-
-    // if (setsockopt(send_sock, SOL_SOCKET, SO_BINDTODEVICE, if_name, sizeof(if_name)) == -1)	{
-	// 	perror("SO_BINDTODEVICE");
-	// 	shutdown(send_sock,2);
-	// 	exit(errno);
-	// }
-
     addr_sink.sin_family = AF_INET;
     addr_sink.sin_port = htons(SINK_PORT);
     addr_sink.sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
@@ -149,6 +134,7 @@ int main(int argc, char* argv[])
 	// 	exit(1);
 	// }
 
+    //bind the source to the IP so it uses the VLAN we want
     rt = bind(send_sock, (struct sockaddr*) &addr_src, sizeof(addr_src));
     if (rt != 0)	
     {
