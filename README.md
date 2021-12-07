@@ -16,6 +16,7 @@ Please find a few additional notes on the hardware capabilities and constraints 
 
 ## Repo Contents
 
+* [TSN Switch Setup](switch_setup.md)
 * [PTP Configuration](ptp/README.md)
   * [gPTP Configuration](ptp/gptp/README.md)
 * [VLAN Configuration](VLAN_setup.md)

@@ -4,7 +4,7 @@ The C files in this directory are used to experiment with VLAN configurations wi
 
 **NB**: The interfaces, IP addresses, VLAN ID's, etc. are set in ```constants.h```. This should be modified to match the names and addresses of the machines used in your system. We recommend designating one device to each role.
 
-The network in this application consists of 3 endpoints (11th gen NUC mini-PC's with Intel i225-LM NICs) running Ubuntu 20.04 LTS. Each endpoint is directly connected to a TSN-enabled switch. One endpoint is a data **source**, periodically producing information that needs to get to another endpoint that is acting as the **sink**. At the same time, a **jammer** injects meaningless data into the network, ideally sent to the sink to saturate that link and prevent source-data from getting there. Note that in the network used for testing, there is only 1 switch. This is a test of the Switch's ability to prioritize traffic sent across one link. The sink device MUST be capable of hardware time-stamping and must also be tightly synchronized with the source (see [ptp config](../ptp/README.md))
+The network in this application consists of 3 endpoints (11th gen NUC mini-PC's with Intel i225-LM NICs) running Ubuntu 20.04 LTS. Each endpoint is directly connected to a TSN-enabled switch. One endpoint is a data **source**, periodically producing information that needs to get to another endpoint that is acting as the data **sink**. At the same time, a **jammer** injects meaningless data into the network, ideally sent to the sink to saturate that link and prevent source-data from getting there. Note that in the network used for testing, there is only 1 switch. This is a test of the Switch's ability to prioritize traffic sent across one link. The sink device MUST be capable of hardware time-stamping and must also be tightly synchronized with the source (see [ptp config](../ptp/README.md)).
 
 To get a measure of latency, the source sends data with a recent timestamp and the sink retrieves a hardware timestamp from when that message was received. Note that the source is not using the actual time of sending, but just before - using the real TX time would require a follow-up message containing that value (similar to PTP). The sink will store TX-RX latency, along with a frame-counter, experiment ID, and priority into a CSV file, which can be analyzed and plotted using some [latency processing python scripts](latency_processing/README.md).
 
@@ -14,11 +14,13 @@ There are implementations using Raw (Ethernet), UDP, and TCP sockets as we were 
 
 ## Build and Run
 
-Run ```make all``` on the target environment from this directory to compile the source, sink, and jammer executables.
+Run ```make all``` from this directory to compile the source, sink, and jammer executables.
 
 Most of the executables do not take/need command line arguments, although you can override the default priority with an integer between 0 and 7 to the **XYZ_source.out*** executable.
 
-It is recommended to start the sink first, since the [latency processing](latency_processing/README.md) will calculate a packet drop rate, assuming that frame/packet ID 0 was sent *after* the sink program started. For a full test involving the jammer, that should also be started before the source. The source and sink will print some information for every message send and received, respectively. The sink will automatically exit after it receives 1000 frames.
+It is recommended to start the sink first, since the [latency processing](latency_processing/README.md) will calculate a packet drop rate, assuming that frame/packet ID 0 was sent *after* the sink program started. For a full test involving the jammer, that should also be started before the source. The source and sink will print some information for every message send and received, respectively. The sink will automatically exit after it receives 1000 frames. 
+
+Either jammer (Ethernet or UDP) may be used to the same effect. However, the source and sink should use the same type of socket (Ethernet, UDP, or TCP).
 
 ## Ethernet
 
