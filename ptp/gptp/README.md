@@ -37,7 +37,7 @@ Note that these instructions are specific to **BRS40-8TX** managed L2 switch run
 
 The switch has a set of configurations for "Time" (1) as shown in the image below (TODO), one of which is 802.1AS (gPTP).
 
-![gPTP interface](switch_gPTP_config)
+![gPTP interface](../images/switch_gPTP_config.png)
 
 To enable gPTP, simply click the button that says to turn on (2) and then the save icon along the bottom (3). To monitor the quality of synchronization you can reload the page with an icon at the bottom (4), and parameters within this screen will update to show values like the offset to master, the relative oscillator frequency, and whether the device considers itself to be **synchronized** (5) based on a set of upper and lower hysteresis thresholds.
 
