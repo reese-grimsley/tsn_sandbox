@@ -42,7 +42,6 @@ SOFTWARE.
  * No guarantees for this software. Use as is at your own risk. This is created as a learning exercise.
  */
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -66,41 +65,63 @@ SOFTWARE.
 #include "types.h"
 
 
-int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr, int priority)
+/**
+ * Receive data that the jammer is sending. 
+ * This is not explicitly necessary for the device to be affected by the traffic
+ * Viewing traffic through 'nload' CLI program is sufficient to assert the device is receiving tons of data
+ */ 
+void thread_recv_jammer_data()
+{
+    char recv_data[MAX_UDP_PACKET_SIZE];
+    struct sockaddr_in jammer_recv_addr, jammer_send_addr;
+    socklen_t sizeof_send_addr;
+    int rcv_jam_sock;
+
+    
+    sizeof_send_addr = sizeof(jammer_send_addr);
+
+    rcv_jam_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if( rcv_jam_sock == -1)
+    {
+        printf("Recv-from-jammer socket returned err: [%d]\n", errno);
+        exit(errno);    
+    }
+
+    jammer_recv_addr.sin_family = AF_INET;
+    jammer_recv_addr.sin_port = SINK_PORT;
+    jammer_recv_addr.sin_addr.s_addr = inet_addr(SINK_IP_ADDR);
+
+    bind(rcv_jam_sock, (struct sockaddr*) &jammer_recv_addr, sizeof(jammer_recv_addr));
+
+    while(1)
+    {
+        recvfrom(rcv_jam_sock, recv_data, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr*) &jammer_send_addr, &sizeof_send_addr);
+        printf("recv jammer pkt\n");
+    }
+
+    pthread_exit(NULL);
+}
+
+int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, struct sockaddr_in *rcv_src_addr)
 {
     int rcv_src_sock, rt;
-    int prio_from_sock, len_size;
+    char dest_addr[ETHER_ADDR_LEN+1]= SINK_MAC_ADDR;
+    char if_name[32] = IF_NAME;
 
-    rcv_src_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //e.g. ETH_P_TSN
+    rcv_src_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); //e.g. ETH_P_TSN
     if( rcv_src_sock == -1)
     {
         printf("Recv-from-source socket returned err: [%d]\n", errno);
         exit(errno);    
     }
 
-    set_socket_priority(rcv_src_sock, priority);
-
-    len_size = sizeof(prio_from_sock);
-    rt = getsockopt(rcv_src_sock, SOL_SOCKET, SO_PRIORITY, &prio_from_sock, &len_size);
-    if (rt != 0)
-    {
-        printf("Failed to get priority [%d] ([%d] bytes) for socket; errno: [%d]\n", prio_from_sock, len_size, errno);
-    } else
-    {
-        printf("Socket said to have priority [%d]\n", prio_from_sock);
-    }
-
-    if (setsockopt(rcv_src_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
-    {
-        printf("setsockopt(SO_REUSEADDR) failed");
-        shutdown(rcv_src_sock, 2);
-        exit(errno);
-    }
 
     rt = configure_hw_timestamping(rcv_src_sock);
     if (rt == -1)
     {
-
+        printf("Failed to setup; shutdown. errno [%d]", errno);
+        shutdown(rcv_src_sock, 2);
+        exit(errno);
     }
 
 
@@ -113,6 +134,14 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
     rcv_src_addr->sin_addr.s_addr = inet_addr(SINK_IP_ADDR_VLAN);
 
 
+    // addr_sink.sll_ifindex = ifr.ifr_ifindex;
+
+	// if (inet_aton(SINK_IP_ADDR , &addr_sink.sin_addr) == 0) 
+	// {
+	// 	fprintf(stderr, "inet_aton() failed\n");
+	// 	exit(1);
+	// }
+
     rt = bind(rcv_src_sock, (struct sockaddr*) rcv_src_addr, sizeof(*rcv_src_addr));
     if (rt != 0)	
     {
@@ -124,48 +153,26 @@ int configure_source_receiving_sock(uint16_t frame_type, struct ifreq *ifr, stru
     return rcv_src_sock;
 }
 
-void thread_recv_source_data(void *args)
+void thread_recv_source_data()
 {
 
     struct ifreq ifr;
-    int rc, rt;
+    int rc;
     char ctrl[4096], data[4096], buf[4096];
     struct cmsghdr *cmsg;
-    struct sockaddr_in rcv_src_addr, src_addr;
+    struct sockaddr_in rcv_src_addr;
     struct timespec ts;
     struct msghdr msg;
     struct iovec iov;
     struct timespec now, start, diff, time_from_source, time_from_nic, t_prop;
     int16_t frame_type;
-    int len;
-    int32_t msgs_received, last_frame_id, last_test_id;
-    int priority;
-
-    priority = *((int*) args);
+    int msgs_received, last_frame_id;
 
     memset(data, 0, 4096);
     iov.iov_base = data;
     iov.iov_len = 4096;
 
-    printf("Setup sink socket\n");
-    int server_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr, priority);
-    rc = listen(server_sock, 2);
-    if (rc != 0)
-    {
-        perror("listen socket");
-		shutdown(server_sock,2);
-		exit(errno);
-    }
-    
-    int rcv_src_sock = accept(server_sock, (struct sockaddr*) &src_addr, &len);
-    if (rcv_src_sock < 0)
-    {
-        perror("accept socket");
-		shutdown(server_sock,2);
-		exit(errno);
-    }
-
-    set_socket_priority(rcv_src_sock, priority);
+    int rcv_src_sock = configure_source_receiving_sock(frame_type, &ifr, &rcv_src_addr);
 
     // setup control messages; these are retrieved from the kernel/socket/NIC to get the hardware RX timestampß
     cmsg = (struct cmsghdr *) &ctrl;
@@ -180,8 +187,7 @@ void thread_recv_source_data(void *args)
 
     msgs_received = 0;
     last_frame_id = -1;
-    last_test_id = -1;
-    FILE* log_file = fopen("tcp_source_sink_latency.csv", "a");
+    FILE* log_file = fopen("source_sink_latency.csv", "a");
 
     clock_gettime(CLOCK_REALTIME, &start);
     printf("Started steady state at t=");
@@ -192,24 +198,27 @@ void thread_recv_source_data(void *args)
     while(msgs_received < LATENCY_SAMPLES_TO_LOG) 
     {
         int msg_size;
-        union tcp_packet* pkt;
+        msg_size = recvmsg(rcv_src_sock, &msg, 0);
+
+        // if ( (((struct sockaddr_ll*) msg.msg_name)->sll_protocol) == htons(frame_type) )
+        // {
+        union udp_dgram* dgram;
         int32_t frame_id, priority, test_id;
 
-        msg_size = recvmsg(rcv_src_sock, &msg, 0);
         msgs_received++;
 
         //this is a frame we want.
-        pkt = (union tcp_packet*) msg.msg_iov->iov_base;
+        dgram = (union udp_dgram*) msg.msg_iov->iov_base;
 
         //retrieve data from the payload
-        memcpy(&time_from_source, &(pkt->ss_payload.tx_time), sizeof(struct timespec));
-        frame_id = pkt->ss_payload.frame_id;
-        priority = pkt->ss_payload.frame_priority;
-        test_id = pkt->ss_payload.test_id;
+        memcpy(&time_from_source, &(dgram->ss_payload.tx_time), sizeof(struct timespec));
+        frame_id = dgram->ss_payload.frame_id;
+        priority = dgram->ss_payload.frame_priority;
+        test_id = dgram->ss_payload.test_id;
 
         printf("[%d]th TSN frame with priority [%d]!\n", msgs_received, priority);
 
-        //calculate and log latency as differences between software timestamp prior to TX and hardware timestamp of RX. To get hardware TX timestamp, need 2 messages. 
+
         if (get_hw_timestamp_from_msg(&msg, &time_from_nic))
         {
             memset(&t_prop, 0, sizeof(t_prop));
@@ -220,9 +229,9 @@ void thread_recv_source_data(void *args)
             printf("\n-----\n");
 
             //keep logs consistent within the same test
-            if ((last_frame_id != -1 && last_frame_id > frame_id) ||
-                (last_test_id != -1 && test_id != last_test_id)) 
+            if (last_frame_id != -1 && last_frame_id > frame_id)
             {
+                fclose(log_file);
                 break;
             }
 
@@ -231,12 +240,10 @@ void thread_recv_source_data(void *args)
 
         }
         last_frame_id = frame_id;
-        last_test_id = test_id;
         //ensure some data gets written in case of intermittent failure
         if (msgs_received % 50 == 0) fflush(log_file);
 
-        char response[32] = "ACKNOWLEDGE!";
-        sendto(rcv_src_sock, response, sizeof(response), 0, (struct sockaddr*) &src_addr, sizeof(src_addr));
+        // }
 
         fflush(stdout);
 
@@ -251,19 +258,24 @@ void thread_recv_source_data(void *args)
 
 int main(int argc, char* argv[])
 {
-    int priority = 0;
-
-    if (argc == 2)
+    int use_jammer = 0;
+    if (argc >=2 && strcmp(argv[1], "jam") == 0 )
     {
-        int prio = atoi(argv[1]);
-        printf("Passed arg %s; intepreted as priority [%d]\n", argv[1], prio);
-        if (prio >= 0 && prio <= 7) priority = prio;
+        use_jammer = 1;
     }
 
-    pthread_t recv_source;
+    pthread_t recv_jammer, recv_source;
 
-    pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, (void*)&priority);
+    if (use_jammer)
+    {
+        pthread_create(&recv_jammer, NULL, (void*) thread_recv_jammer_data, NULL);
+    }
+    pthread_create(&recv_source, NULL, (void*) thread_recv_source_data, NULL);
 
+    if (use_jammer)
+    {
+        pthread_join(recv_jammer, NULL);
+    }
     pthread_join(recv_source, NULL);
 
     printf("Exiting sink\n");

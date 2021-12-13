@@ -58,9 +58,9 @@ SOFTWARE.
 #include "types.h"
 
 
-struct timespec WAIT_DURATION = {.tv_sec = 1, .tv_nsec = 00000000};
+struct timespec WAIT_DURATION = {.tv_sec = 0, .tv_nsec = 100000000};
 
-int default_priority = 0;
+int default_priority = 3;
 
 int main(int argc, char* argv[])
 {
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     if (argc == 2)
     {
         int prio = atoi(argv[1]);
-        printf("Passed arg %s; intepreted as priority [%d]\n", argv[1], prio);
+        printf("Passed arg %s; intepreted as priority [%d]", argv[1], prio);
         if (prio >= 0 && prio <= 7) priority = prio;
     }
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     srand ( time(NULL) );
     int32_t test_id = random();
 
-    int send_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int send_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if( send_sock == -1)
     {
         printf("Send socket returned err: [%d]\n", errno);
@@ -105,13 +105,6 @@ int main(int argc, char* argv[])
         printf("Socket said to have priority [%d]\n", prio_from_sock);
     }
 
-    if (setsockopt(send_sock, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
-    {
-        printf("setsockopt(SO_REUSEADDR) failed");
-        shutdown(send_sock, 2);
-        exit(errno);
-    }
-
     struct sockaddr_in addr_sink, addr_src;
     struct ifreq ifr;
 
@@ -126,15 +119,6 @@ int main(int argc, char* argv[])
     addr_src.sin_port = htons(SINK_PORT);
     addr_src.sin_addr.s_addr = inet_addr(SOURCE_IP_ADDR_VLAN);
 
-    // addr_sink.sll_ifindex = ifr.ifr_ifindex;
-
-	// if (inet_aton(SINK_IP_ADDR , &addr_sink.sin_addr) == 0) 
-	// {
-	// 	fprintf(stderr, "inet_aton() failed\n");
-	// 	exit(1);
-	// }
-
-    //bind the source to the IP so it uses the VLAN we want
     rt = bind(send_sock, (struct sockaddr*) &addr_src, sizeof(addr_src));
     if (rt != 0)	
     {
@@ -142,23 +126,12 @@ int main(int argc, char* argv[])
 		shutdown(send_sock,2);
 		exit(errno);
 	}
-    printf("Bound source to VLAN address %s\n", SOURCE_IP_ADDR_VLAN);
 
-    rt = connect(send_sock, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
-    if (rt != 0)	
-    {
-		perror("connect socket");
-		shutdown(send_sock,2);
-		exit(errno);
-	}
-    printf("Connected source to sink at VLAN address %s\n", SINK_IP_ADDR_VLAN);
+    union udp_dgram dgram;
 
-
-    union tcp_packet pkt;
-
-    pkt.ss_payload.test_id = test_id;
-    pkt.ss_payload.frame_priority = priority;
-    memset(((char*)&(pkt.data))+sizeof(struct source_sink_payload), 'q', sizeof(pkt) - sizeof(struct source_sink_payload));
+    dgram.ss_payload.test_id = test_id;
+    dgram.ss_payload.frame_priority = priority;
+    memset(((char*)&(dgram.data))+sizeof(struct source_sink_payload), 'q', sizeof(dgram) - sizeof(struct source_sink_payload));
 
     printf("**********************\nStart source side of source-sink connection for Test [%d]\n**********************\n", test_id);
 
@@ -170,13 +143,13 @@ int main(int argc, char* argv[])
     {
         // add timestamp to frame
         clock_gettime(CLOCK_REALTIME, &now);
-        memcpy(&pkt.ss_payload.tx_time, (void*) &now, sizeof(now));
+        memcpy(&dgram.ss_payload.tx_time, (void*) &now, sizeof(now));
 
-        pkt.ss_payload.frame_id = counter;
-        // print_hex(pkt.data, 40); printf("\n");
+        dgram.ss_payload.frame_id = counter;
+        print_hex(dgram.data, 40); printf("\n");
 
 
-        int rc = sendto(send_sock, (void*) &pkt, sizeof(pkt), 0, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
+        int rc = sendto(send_sock, (void*) &dgram, sizeof(dgram), 0, (struct sockaddr*) &addr_sink, sizeof(addr_sink));
         if (rc < 0)
         {
             printf("Socket did not send correctly... returned [%d] (error number: [%d])", rc, errno);
@@ -184,22 +157,14 @@ int main(int argc, char* argv[])
             continue;
         }
 
-        printf("send msg %d of %d bytes at ", counter, rc);
+        printf("send msg %d of  %d bytes at ", counter, rc);
         print_timespec(now);
         printf("\n");
 
-        char recv_data[32];
-        memset(recv_data, 0, 32);
-        recv(send_sock, (void*)recv_data, 32, 0);
-        printf("Recived string from sink: [%s]\n", recv_data);
-
         int no_print = 1;
         wait(WAIT_DURATION, no_print);
-        
         fflush(stdout);
         counter++;
-
-
     }
 
 

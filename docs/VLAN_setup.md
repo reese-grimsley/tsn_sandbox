@@ -10,7 +10,6 @@ Disclaimer: These directions are based on an Ubuntu 20.04 LTS Linux distribution
 
 ## Command Line Configuration
 
-<!-- Most directions online are for command-line configuration. This has the advantage of being easier to setup and debug, but the disadvantage of not persisting across resets. For that, please see [File-Based Configuration](##file-based-configuration). -->
 
 This configuration, along with many other mechanisms used, requires root permissions. It uses the [iproute2](http://manpages.ubuntu.com/manpages/trusty/man8/ip.8.html) tool inherent to modern Ubuntu distributions.
 
@@ -24,7 +23,7 @@ sudo ip link add link enp87s0 name enp87s0.3 type vlan id 3
 
 ### Setting Egress Traffic Mapping
 
-Next, we'll set the egress (outgoing) mapping between traffic classes and VLAN priorities. Note that you may manipulate the traffic class at the socket level with [setsockopt](https://man7.org/linux/man-pages/man2/setsockopt.2.html) and SO_PRIORITY. There is a helper function, set_socket_priority in [helpers.h](latency_vlan_tests/helpers.h) that will do this.
+Next, we'll set the egress (outgoing) mapping between traffic classes and VLAN priorities. Note that you may manipulate the traffic class at the socket level with [setsockopt](https://man7.org/linux/man-pages/man2/setsockopt.2.html) and SO_PRIORITY. There is a helper function, set_socket_priority in [helpers.h](../latency_vlan_tests/helpers.h) that will do this.
 
 ```
 sudo ip link set enp87s0.3 type vlan egres 0:2 1:1 2:0 3:3 4:4 5:5 6:6 7:7
@@ -72,13 +71,14 @@ Replacing ```up``` with ```down``` will similarly turn the interface off.
 
 ### Testing the VLANs and Priorities
 
-To test the VLAN, you can use the C files in [latency_vlan_tests](latency_vlan_tests). The corresponding [README](latency_vlan_tests/README.md) describes what each file does. While these are running, you may analyze packets using tcpdump or wireshark.
+To test the VLAN, you can use the C files in [latency_vlan_tests](../latency_vlan_tests). The corresponding [README](../latency_vlan_tests/README.md) describes what each file does. While these are running, you may analyze packets using tcpdump or wireshark.
 
 If you are using tcpdump (which may require installation with apt), you can call it like so: ```sudo tcpdump -xevvv > dump.log```. Let it run for a few seconds, and kill the program. When you read the new ```dump.log```, it will show frame contents, ethernet header information, and other protocol-specific information.
 
 Most importantly, you should see "vlan 5 p 3" within the frames sent using VLAN 5 as we configured [here](#configuration-with-a-single-command). The vlan and priority values will be different for other configurations of course; this is showing that a frame was sent using VLAN 5 with a priority of 3. You can see this in the sender or receiver.
 
 <!-- ## File-Based Configuration -->
+<!-- Commented out because I cannot find a way to configure VLANs through netplan with custom QOS mappings, nor can I turn on MVRP>
 
 <!-- File-based configuration is harder to debug, but will persist across device/network-service reboots. Ubuntu versions newer than 17.10 use [netplan](https://netplan.io/examples/) rather than /etc/network/interfaces.
 

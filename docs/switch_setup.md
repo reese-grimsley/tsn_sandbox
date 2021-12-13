@@ -14,13 +14,11 @@ If there are multiple switches, they should be configured identically, aside fro
 * [VLAN Configuration](#vlan-configuration)
 * [TSN TDMA-style QoS](#tsn-functions)
 
-
 ## Guides and Documents from Belden and Hirschmann
 
 [Hirschmann BOBCAT BRS User Manual](https://www.doc.hirschmann.com/pdf/IG_BRS20304050_02_1118_en_2018-11-15.pdf)
 [Switch Operating System Version 8.X](https://catalog.belden.com/index.cfm?event=pd&p=PF_HiOS8BOBCAT)
 [Hirschmann BOBCAT BRS40 Documents](https://catalog.belden.com/index.cfm?event=config&p=BRS40-8TX-EEC&c=Config215832)
-
 
 ## Switch Setup
 
@@ -30,7 +28,7 @@ Before anything else, the switch must be powered on. It takes a 12-24 V power su
 
 The image below shows the switch plugged into 3 NUC mini-PC endpoints (ports 2, 4, and 8) and a local router (port 7). The power supply is rigged to expose power and ground (white and black wires, resp.) for plugin to the terminals as shown.
 
-![switch](./images/wiselab_switch_setup.jpg)
+![switch](../images/wiselab_switch_setup.jpg)
 
 Note that there is also a USB-C to USB-A cable connecting the switch to one of the NUCs. This cable is located between the status lights and the Ethernet ports, and is used for initial configuration before the switch is assigned an IP address
 
@@ -40,17 +38,17 @@ The initial setup process involves logging into the switch using the default use
 
 Once logged in, you should see an interface like the one below:
 
-![Switch Splash Page](./images/switch_system.png)
+![Switch Splash Page](../images/switch_system.png)
 
 This shows basic information like power-supply status (missing supplies will show as defective), a device name, uptime, port status, etc.
 
 The settings are categorized hierarchically along the left side of the interface. Navigate to *Basic Settings -> Software* to view the current version of the operating system, HiOS. It should be at least 8.7; earlier versions may not have TSN features. Software may be updated by dragging the binary into the "Software update" box in the middle of this screen. See an image of this interface below:
 
-![Switch Software Version](images/switch_software_interface.png)
+![Switch Software Version](../images/switch_software_interface.png)
 
 The switch will use a configuration loaded into memory, which it will read from NVM by default. The configuration stored in NVM is not necessarily the same as what it is currently running. The two can be synchronized from the *Basic Settings -> Load/Save* menu as shown below. If NVM and the running configuration are in sync, a box in the upper right will be checked. To save the current configuration, use the save/floppy disk icon at the bottom of the screen (not shown).
 
-![Switch Load/Save Config](images/switch_config_memory.png)
+![Switch Load/Save Config](../images/switch_config_memory.png)
 
 #### DHCP
 
@@ -64,13 +62,13 @@ The switch may synchronize its clock and propagate timing information to connect
 
 The image below shows the switch's interface for 802.1AS/gPTP, which we use in our system.
 
-![gPTP interface](./images/switch_gPTP_config.png)
+![gPTP interface](../images/switch_gPTP_config.png)
 
-See also the [readme](./ptp/gptp/README.md) in the PTP directories. The default settings here will suffice.
+See also the [readme](../ptp/gptp/README.md) in the PTP directories. The default settings here will suffice.
 
 You may also view synchronization parameters and statistics for devices connected at each port in the *Time -> 802.1AS -> Port* and *Time -> 802.1AS -> Statistics* menus. The image below shows the former interface, in which we can see this switch is acting as the slave to a clock at port 8 and a master to clocks at ports 2 and 6.
 
-![gPTP stats](./images/switch_gPTP_port-info.png)
+![gPTP stats](../images/switch_gPTP_port-info.png)
 
 Port 6 appears to be poorly synchronized based on the reported Peer delay and Neighbor clock rate ratio -- this interface is useful for displaying anamolies.
 
@@ -80,9 +78,9 @@ VLANs are central to TSN, as almost every standard under the TSN umbrella is an 
 
 The bulk of VLAN configuration happens on the endpoint devices per the [instructions](VLAN_setup.md) in this repo.
 
-VLANs may be configured under *Switching -> VLAN*, but some VLAN settings are in other sections within *Switching*. The image below shows the VLANs configured per the other instructions. 
+VLANs may be configured under *Switching -> VLAN*, but some VLAN settings are in other sections within *Switching*. The image below shows the VLANs configured per the other instructions.
 
-![configured vlans](./images/switch_vlans_configured&learned.png)
+![configured vlans](../images/switch_vlans_configured&learned.png)
 
 We see VLAN 3 will be used to send tagged (T) frames from ports 2, 6, and 8. We also see VLAN 5 will be used to send tagged frames from ports 2, 6, and 8; this VLAN was learned using MVRP, which we will setup next. VLAN 1 is always present and is meant for sending management messages between nodes.
 
@@ -90,7 +88,7 @@ We see VLAN 3 will be used to send tagged (T) frames from ports 2, 6, and 8. We 
 
 Multiple VLAN Registration Protocol (VLAN) is an IEEE protocol based on MRP for configuring and propagating VLAN information. All this requires is flicking the switch from off to on in the *Switching -> MRP-IEEE -> MVRP* page, as shown below.
 
-![mvrp](./images/switch_mvrp.png)
+![mvrp](../images/switch_mvrp.png)
 
 When [VLANs are configured with MVRP on](VLAN_setup.md#setting-mvrp) in the endpoints, their membership to the VLAN will be automatically sent to the switch.
 
@@ -104,7 +102,7 @@ At the level of the endpoints, the priority comes from an ["egress-qos-mapping"]
 
 It is not required to change this; it is preferred to handle this in the endpoint itself, although it is worth seeing that priorities 0-2 do not have a 1-to-1 mapping (3-7 do).
 
-![qos-mapping](./images/switch_QoS_priority_tc_mapping.png)
+![qos-mapping](../images/switch_QoS_priority_tc_mapping.png)
 
 ## TSN Functions
 
@@ -112,13 +110,13 @@ TSN functions and configurations are located in *Switching -> TSN*. As of HiOS v
 
 Note that TSN functions will not work unless the switch is synchronized with PTP or 802.1AS. If it is not synchronized, it is not possible to turn on TSN functions at the top of the top-level TSN configuration page. This page is shown below:
 
-![tsn-config](./images/switch_TSN_basic_config.png)
+![tsn-config](../images/switch_TSN_basic_config.png)
 
 If the device at a port is not synchronized, it will be shown as 'pending', like in the image.
 
 TDMA style traffic shaping is handled on a per-port basis, configured under *Switching -> TSN -> Gate Control List -> Configured*. There is a global cycle time in the main Configuration page (default of 1ms). Each port's "Gate Control List" is a set of time slots, relative to the global cycle, that will send frames from 0 or more [traffic classes](#vlan-priority-and-traffic-class). An example is shown in the image below:
 
-![Gate Control List](./images/switch_TSN_GCL.png)
+![Gate Control List](../images/switch_TSN_GCL.png)
 
 The 'gate states' is a set of nonexclusive traffic classes that are allowed to send frames during this time interval. Each interval follows the previous one; it is recommended to include a guard band (empty gate state) of at least 8000 ns between each gate state that is non-empty.
 

@@ -24,7 +24,7 @@ Either jammer (Ethernet or UDP) may be used to the same effect. However, the sou
 
 ## Ethernet
 
-The Ethernet example uses Raw Sockets to send directly from the MAC address of the source to the MAC of the sink. The switch will forward this information and preserve VLAN tags if configured as per the [instructions](../VLAN_setup.md).
+The Ethernet example uses Raw Sockets to send directly from the MAC address of the source to the MAC of the sink. The switch will forward this information and preserve VLAN tags if configured as per the [instructions](../docs/VLAN_setup.md).
 
 Like UDP, there is no such thing as a connection for Raw sockets. The source socket sends frames to a MAC address (which is also manually added to the first few bytes of the frame's header) with an ethernet frame type ([see if_ether](https://github.com/torvalds/linux/blob/master/include/uapi/linux/if_ether.h) for examples), and a sink socket declares a frame type that it wishes to receive.
 

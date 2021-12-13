@@ -13,9 +13,6 @@ Python3 with the following packages:
 * Pandas
 * Matplotlib
 
-## TODO
-
-* Add arg parsing for the jammer, no jammer filenames, switch for network type (UDP, TCP, Eth)
 
 ## Sample Outputs from CMU Network
 
